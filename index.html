@@ -15,19 +15,19 @@
 </span>
 <table class="board large">
 <tr>
-    <td id="pos0" class="p0"></td>
-    <td id="pos1" class="p1"></td>
-    <td id="pos2" class="p2"></td>
+    <td id="pos0" class="p0" data-cell-n="7"></td>
+    <td id="pos1" class="p1" data-cell-n="8"></td>
+    <td id="pos2" class="p2" data-cell-n="9"></td>
 </tr>
 <tr>
-    <td id="pos3" class="p3"></td>
-    <td id="pos4" class="p4"></td>
-    <td id="pos5" class="p5"></td>
+    <td id="pos3" class="p3" data-cell-n="4"></td>
+    <td id="pos4" class="p4" data-cell-n="5"></td>
+    <td id="pos5" class="p5" data-cell-n="6"></td>
 </tr>
 <tr>
-    <td id="pos6" class="p6"></td>
-    <td id="pos7" class="p7"></td>
-    <td id="pos8" class="p8"></td>
+    <td id="pos6" class="p6" data-cell-n="1"></td>
+    <td id="pos7" class="p7" data-cell-n="2"></td>
+    <td id="pos8" class="p8" data-cell-n="3"></td>
 </tr>
 </table>
 <div class="players">O: MENACE<br />X:<select id="p2picker" aria-label="Opponent type">
@@ -36,6 +36,10 @@
 <option value="m">MENACE2</option>
 <option value="p">Perfect</option>
 </select></div>
+<div class="human-move" id="human_move_wrap" hidden>
+  <label for="human_cell_input">Your move (1–9): top row 7–9, bottom row 1–3.</label><br />
+  <input type="number" id="human_cell_input" min="1" max="9" step="1" inputmode="numeric" aria-label="Cell number 1 to 9 for your move" />
+</div>
 <div class="wins" id="n1"><small>MENACE Wins</small><div class="dis" id="dis1">0</div></div>
 <div class="wins" id="n2"><small>Draws</small><div class="dis" id="dis0">0</div></div>
 <div class="wins" id="n3"><small><span id="who">Human</span> Wins</small><div class="dis" id="dis2">0</div></div>
@@ -44,7 +48,16 @@
 </div>
 <div class="summary" id="list_here"></div>
 <canvas class="graph" id="plot_here" width="440" height="300" aria-label="Learning progress graph"></canvas>
-<script src="menace.js" defer></script>
+<script src="js/menace-state.js" defer></script>
+<script src="js/menace-utils.js" defer></script>
+<script src="js/menace-rules.js" defer></script>
+<script src="js/menace-plot.js" defer></script>
+<script src="js/menace-ui-summary.js" defer></script>
+<script src="js/menace-ui-panel.js" defer></script>
+<script src="js/menace-engine.js" defer></script>
+<script src="js/menace-opponents.js" defer></script>
+<script src="js/menace-game.js" defer></script>
+<script src="js/menace-init.js" defer></script>
 
 </body>
 </html>

@@ -49,12 +49,23 @@ Then visit `http://localhost:8080` (or the URL your tool prints).
 ## Project layout
 
 
-| File         | Role                                       |
-| ------------ | ------------------------------------------ |
-| `index.html` | Document shell, CSP, links to assets       |
-| `styles.css` | Layout and styling                         |
-| `menace.js`  | Game logic, MENACE learning, minimax, plot |
+| File                      | Role                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| `index.html`              | Document shell, CSP, links to assets                         |
+| `styles.css`              | Layout and styling                                           |
+| `js/menace-state.js`      | Shared globals (engines, board, scores, plot series)         |
+| `js/menace-utils.js`      | Small array helpers (`count`, `arrmin`, …)                   |
+| `js/menace-rules.js`      | Rotations, line wins, `winner` / `opposite_result`           |
+| `js/menace-plot.js`       | Canvas learning curve                                        |
+| `js/menace-ui-summary.js` | Status log and win-counter updates                           |
+| `js/menace-ui-panel.js`   | Matchbox grid HTML, settings panel, delegated clicks         |
+| `js/menace-engine.js`     | Matchbox build/search, bead updates, `get_menace_move`       |
+| `js/menace-opponents.js`  | Random, perfect (minimax), and move helpers used by the loop |
+| `js/menace-game.js`       | Main board, `new_game`, play loop, human input               |
+| `js/menace-init.js`       | `DOMContentLoaded` wiring                                    |
 
+
+Scripts load in that order (classic globals, no bundler).
 
 ## Further reading
 

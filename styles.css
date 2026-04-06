@@ -30,9 +30,28 @@ table.board:not(.large) td {
 }
 
 table.board.large td {
+  position: relative;
   font-size: 22px;
   width: 40px;
   height: 40px;
+}
+
+table.board.large td::before {
+  content: attr(data-cell-n);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.14);
+  z-index: 0;
+  pointer-events: none;
+  line-height: 1;
+}
+
+table.board.large td.has-mark::before {
+  content: none;
 }
 
 table.board.large {
@@ -118,6 +137,8 @@ table.board td button {
   background: transparent;
   cursor: pointer;
   font: inherit;
+  position: relative;
+  z-index: 1;
 }
 
 .players {
@@ -131,6 +152,24 @@ table.board td button {
   top: 90px;
   left: 280px;
   text-align: left;
+}
+
+.human-move {
+  position: absolute;
+  top: 120px;
+  left: 280px;
+  text-align: left;
+  max-width: 200px;
+}
+
+.human-move input[type="number"] {
+  width: 4rem;
+  margin-top: 0.25rem;
+}
+
+.menace_settings input.slider[type="range"] {
+  vertical-align: middle;
+  max-width: 12rem;
 }
 
 .moves-container {

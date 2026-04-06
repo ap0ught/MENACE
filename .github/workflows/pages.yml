@@ -27,7 +27,8 @@ jobs:
       - name: Prepare site bundle
         run: |
           mkdir -p site
-          cp index.html styles.css menace.js site/
+          cp index.html styles.css site/
+          cp -r js site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
