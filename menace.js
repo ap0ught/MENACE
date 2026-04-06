@@ -33,9 +33,7 @@ var menace = {
 }
 
 // what is player 2?
-var player = 'h'
-document.getElementById("p2picker").value = "h"
-document.getElementById("speeddiv").style.display = "none"
+var player = "h"
 var whoA = {"h":"Human", "r":"Random", "m":"MENACE2", "p":"Perfect"}
 
 // plotting
@@ -50,7 +48,7 @@ var playagain = true
 var wins_each = [0,0,0]
 var board = [0,0,0,0,0,0,0,0,0]
 var no_winner = true
-var pieces = ["","&#9711;","&times;"]
+var pieces = ["","\u25CB","\u00D7"]
 var said = ["","","","","","","","","",""]
 var human_turn=false
 var pwns = [
@@ -116,7 +114,17 @@ function new_game(){
         board = [0,0,0,0,0,0,0,0,0]
         no_winner = true
         for(var i=0;i<9;i++){
-            document.getElementById("pos"+i).innerHTML = "<form onsubmit='javascript:play_human("+i+");return false'><input type='submit' value=' '></form>"
+            var td = document.getElementById("pos"+i)
+            td.textContent = ""
+            var btn = document.createElement("button")
+            btn.type = "button"
+            btn.setAttribute("aria-label", "Play cell " + (i + 1))
+            ;(function (idx) {
+                btn.addEventListener("click", function () {
+                    play_human(idx)
+                })
+            })(i)
+            td.appendChild(btn)
         }
         play_menace()
     }
@@ -124,7 +132,7 @@ function new_game(){
 
 function setPlayer(setTo){
     player = setTo
-    document.getElementById("who").innerHTML = whoA[setTo]
+    document.getElementById("who").textContent = whoA[setTo]
     if(setTo=="m"){
         show_menace(2)
     } else {
@@ -180,7 +188,7 @@ function do_win(who_wins){
     no_winner = false
     for(var i=0;i<9;i++){
         if(board[i] == 0){
-            document.getElementById("pos"+i).innerHTML = ""
+            document.getElementById("pos"+i).textContent = ""
         }
     }
     menace_add_beads(who_wins)
@@ -192,7 +200,7 @@ function do_win(who_wins){
 }
 
 function play_menace(){
-    where = get_menace_move(1)
+    var where = get_menace_move(1)
     if(where=="resign"){
         if(count(board,0)==9){
             say("MENACE has run out of beads in the first box and refuses to play.")
@@ -204,7 +212,7 @@ function play_menace(){
         return
     }
     board[where] = 1
-    document.getElementById("pos"+where).innerHTML = pieces[1]
+    document.getElementById("pos"+where).textContent = pieces[1]
     check_win()
     if(no_winner){
         play_opponent()
@@ -231,7 +239,7 @@ function play_opponent(){
         return
     }
     board[where] = 2
-    document.getElementById("pos"+where).innerHTML = pieces[2]
+    document.getElementById("pos"+where).textContent = pieces[2]
     check_win()
     if(no_winner){
         window.setTimeout(play_menace, -parseInt(document.getElementById("speed_slider").value)/10)
@@ -353,7 +361,7 @@ function reset_menace(n){
         redraw_plot()
         wins_each = [0,0,0]
         for (var i=0;i<3;i++) {
-            document.getElementById("dis"+i).innerHTML = wins_each[i]
+            document.getElementById("dis"+i).textContent = String(wins_each[i])
         }
 
         add_box("000000000",1,0)
@@ -441,7 +449,7 @@ function get_menace_move(n){
 function update_totals(n){
     plotdata.push(plotdata[plotdata.length-1]+menace[1]["incentives"][n])
     wins_each[n] += 1
-    document.getElementById("dis"+n).innerHTML = wins_each[n]
+    document.getElementById("dis"+n).textContent = String(wins_each[n])
     update_plot()
 }
 
@@ -455,11 +463,11 @@ function say(stuff){
         new_said.push(said[i])
     }
     said = new_said
-    document.getElementById("list_here").innerHTML = said.join("<br />")
+    document.getElementById("list_here").textContent = said.join("\n")
 }
 
 function make_ox(pos,n){
-    var output = "<center><table class='board'>"
+    var output = "<div class='center'><table class='board'>"
     for(var i=0;i<9;i++){
         if(i%3 == 0){output+="<tr>"}
         output += "<td id='"+pos+"-"+i+"' class='p"+i
@@ -472,7 +480,7 @@ function make_ox(pos,n){
         }
         if(i%3 == 2){output+="</tr>"}
     }
-    output += "</table></center>"
+    output += "</table></div>"
     return output
 }
 
@@ -507,9 +515,9 @@ function show_menace(n){
     if(n==2){
         menacename += "2"
     }
-    var output = ""
-    output += "<span id='_"+n+"_tweak_s'><center><a href='javascript:show_set("+n+")'>&#x25BC; Show "+menacename+"'s settings &#x25BC;</a></center></span>"
-    output += "<span class='menace_settings' id='_"+n+"_tweak_h' style='display:none'><center><a href='javascript:hide_set("+n+")'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</center></a>"
+    var output = "<div class='menace-panel'>"
+    output += "<div id='_"+n+"_tweak_s'><div class='center'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"'>&#x25BC; Show "+menacename+"'s settings &#x25BC;</button></div></div>"
+    output += "<div class='menace_settings' id='_"+n+"_tweak_h'><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
     output += "<div class='menace_settings_title'>Number of beads in each box before any games are played</div>"
     if(n==1){
         output += "First Moves: <input size=1 id='im1' /><br />"
@@ -530,17 +538,10 @@ function show_menace(n){
     output += "Lose: Take <input size=1 id='_"+n+"_ic_l' /> beads"
     output += "<div class='menace_settings_title'>Update settings</div>"
     output += "To save these settings, press this button:"
-    output += "<form onsubmit='update_set("+n+");return false'>"
-    output += "<input type='submit' value='Update "+menacename+"'>"
-    output += "</form>"
+    output += "<div><button type='button' class='menace-btn-solid' data-menace-action='update' data-menace-id='"+n+"'>Update "+menacename+"</button></div>"
     output += "<br />To save these settings and reset MENACE to their initial state before and games are played, press this button:"
-    output += "<form onsubmit='update_set_r("+n+");return false'>"
-    output += "<input type='submit' value='Update and reset "+menacename+"'>"
-    output += "</form>"
-    output += "<br /><center><a href='javascript:hide_set("+n+")'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</center></a>"
-    output += "</span>"
-
-    output += "</form>"
+    output += "<div><button type='button' class='menace-btn-solid' data-menace-action='update-reset' data-menace-id='"+n+"'>Update and reset "+menacename+"</button></div>"
+    output += "<br /><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
     output += "</div>"
     output += "<br />";
     var boxout = ""
@@ -563,7 +564,7 @@ function show_menace(n){
         }
         boxout += "<br />";
         var cols = 0
-        boxout += "<center><table class='moves'>"
+        boxout += "<div class='center'><table class='moves'>"
         for(var k=0;k<menace[n]["orderedBoxes"][move].length;k++){
             var key = menace[n]["orderedBoxes"][move][k]
             if(cols == 0){
@@ -580,11 +581,12 @@ function show_menace(n){
         if(cols != 0){
             boxout += "</tr>"
         }
-        boxout += "</table></center><br /><br />"
+        boxout += "</table></div><br /><br />"
     }
     output += "This box shows all " + numb + " matchboxes that make up "+menacename+".<br /><br />"
     output += boxout
     output += "<br /><br />";
+    output += "</div>"
     document.getElementById("_"+n+"_moves").innerHTML = output
 }
 
@@ -594,7 +596,7 @@ function hide_menace(n){
 
 // opponent moves
 function get_random_move(){
-    choices = []
+    var choices = []
     for(var i=0;i<9;i++){
         if(board[i] == 0){
             choices.push(i)
@@ -611,7 +613,7 @@ function play_human(where){
     if(no_winner){
         human_turn = false
         board[where] = 2
-        document.getElementById("pos"+where).innerHTML = pieces[2]
+        document.getElementById("pos"+where).textContent = pieces[2]
         check_win()
         if(no_winner){
             play_menace()
@@ -620,14 +622,14 @@ function play_human(where){
 }
 
 function make_move(plays){
-    total = 0
+    var total = 0
     for(var i=0;i<plays.length;i++){
         total += plays[i]
     }
     if(total == 0){
         return "resign"
     } else {
-        rnd = Math.floor(Math.random()*total)
+        var rnd = Math.floor(Math.random()*total)
         total = 0
         for(var i=0;i<plays.length;i++){
             total += plays[i]
@@ -660,7 +662,7 @@ function minimax(newboard, player) {
         var move = {}
         move.index = choices[i]
         newboard[choices[i]] = player
-        result = minimax(newboard, 3-player)
+        var result = minimax(newboard, 3-player)
         move.score = result.score
         newboard[choices[i]] = 0
         moves.push(move)
@@ -762,5 +764,24 @@ function updateplotlimits(){
     xmax -= xmax % 20
 }
 
-// start game
-reset_menace("both")
+function onMenaceDelegatedClick(e) {
+    var el = e.target.closest("[data-menace-action]")
+    if (!el) return
+    var id = parseInt(el.getAttribute("data-menace-id"), 10)
+    if (id !== 1 && id !== 2) return
+    var action = el.getAttribute("data-menace-action")
+    if (action === "show-settings") show_set(id)
+    else if (action === "hide-settings") hide_set(id)
+    else if (action === "update") update_set(id)
+    else if (action === "update-reset") update_set_r(id)
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("p2picker").value = "h"
+    document.getElementById("speeddiv").style.display = "none"
+    document.getElementById("p2picker").addEventListener("change", function () {
+        setPlayer(this.value)
+    })
+    document.addEventListener("click", onMenaceDelegatedClick)
+    reset_menace("both")
+})
