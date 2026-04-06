@@ -1,16 +1,18 @@
 /*************************************/
 /* MENACE — matchbox grid & settings */
-/* Injects HTML into _1_moves/_2_moves.*/
+/* Single combined panel: MENACE | MENACE2 */
 /*************************************/
 
-/* pos: 9-char board key; n: engine 1 or 2. Renders mini-board with bead counts or marks. */
+/* Mini-board cell ids are prefixed by engine n so both columns can coexist. */
 function make_ox(pos,n){
+    var pfx = "m"+n+"-"
     var output = "<div class='center'><table class='board'>"
     for(var i=0;i<9;i++){
         if(i%3 == 0){output+="<tr>"}
-        output += "<td id='"+pos+"-"+i+"' class='p"+i
+        output += "<td id='"+pfx+pos+"-"+i+"' class='p"+i
         if(pos[i] == 0){
-            output += " num'>"+menace[n]["boxes"][pos][i]+"</td>"
+            var beads = (menace[n]["boxes"][pos] && menace[n]["boxes"][pos][i] !== undefined) ? menace[n]["boxes"][pos][i] : 0
+            output += " num'>"+beads+"</td>"
         } else {
             output += "'>"
             output += pieces[pos[i]]
@@ -23,30 +25,39 @@ function make_ox(pos,n){
 }
 
 function update_box(key,n){
-    document.getElementById("board"+key).innerHTML = make_ox(key,n)
+    var wrap = document.getElementById("m"+n+"_board_"+key)
+    if(wrap){ wrap.innerHTML = make_ox(key,n) }
+}
+
+/* Clamp and sync a range input plus its paired _display span (id + "_display"). */
+function setMenaceSliderValue(sliderId, value, min, max){
+    var el = document.getElementById(sliderId)
+    if(!el){ return }
+    var v = Math.min(max, Math.max(min, value))
+    el.value = String(v)
+    var disp = document.getElementById(sliderId + "_display")
+    if(disp){ disp.textContent = String(v) }
+    var unit = document.getElementById(sliderId + "_unit")
+    if(unit){ unit.textContent = v === 1 ? "bead" : "beads" }
 }
 
 /* Copy engine n state into the settings form (shown when user expands panel). */
 function show_set(n){
     if(n==1){
-        var firstBeads = menace[1]["start"][0]
-        firstBeads = Math.min(20, Math.max(1, firstBeads))
-        document.getElementById("im1").value = String(firstBeads)
-        var im1d = document.getElementById("im1_display")
-        if(im1d){ im1d.textContent = String(firstBeads) }
-        document.getElementById("im3").value = menace[1]["start"][1]
-        document.getElementById("im5").value = menace[1]["start"][2]
-        document.getElementById("im7").value = menace[1]["start"][3]
+        setMenaceSliderValue("im1", menace[1]["start"][0], 1, 20)
+        setMenaceSliderValue("im3", menace[1]["start"][1], 1, 20)
+        setMenaceSliderValue("im5", menace[1]["start"][2], 1, 20)
+        setMenaceSliderValue("im7", menace[1]["start"][3], 1, 20)
     }
     if(n==2){
-        document.getElementById("im2").value = menace[2]["start"][0]
-        document.getElementById("im4").value = menace[2]["start"][1]
-        document.getElementById("im6").value = menace[2]["start"][2]
-        document.getElementById("im8").value = menace[2]["start"][3]
+        setMenaceSliderValue("im2", menace[2]["start"][0], 1, 20)
+        setMenaceSliderValue("im4", menace[2]["start"][1], 1, 20)
+        setMenaceSliderValue("im6", menace[2]["start"][2], 1, 20)
+        setMenaceSliderValue("im8", menace[2]["start"][3], 1, 20)
     }
-    document.getElementById("_"+n+"_ic_w").value = menace[n]["incentives"][1]
-    document.getElementById("_"+n+"_ic_d").value = menace[n]["incentives"][0]
-    document.getElementById("_"+n+"_ic_l").value = -menace[n]["incentives"][2]
+    setMenaceSliderValue("_"+n+"_ic_w", menace[n]["incentives"][1], 0, 20)
+    setMenaceSliderValue("_"+n+"_ic_d", menace[n]["incentives"][0], 0, 20)
+    setMenaceSliderValue("_"+n+"_ic_l", -menace[n]["incentives"][2], 0, 20)
     document.getElementById("_"+n+"_includeall").checked = menace[n]["removesymm"]
     document.getElementById("_"+n+"_tweak_h").style.display = "block"
     document.getElementById("_"+n+"_tweak_s").style.display = "none"
@@ -57,71 +68,61 @@ function hide_set(n){
     document.getElementById("_"+n+"_tweak_s").style.display = "block"
 }
 
-/* Rebuild entire side panel: settings block + all matchbox thumbnails in move groups. */
-function show_menace(n){
-    var menacename = "MENACE"
-    if(n==2){
-        menacename += "2"
-    }
-    var output = "<div class='menace-panel'>"
-    output += "<div id='_"+n+"_tweak_s'><div class='center'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"'>&#x25BC; Show "+menacename+"'s settings &#x25BC;</button></div></div>"
-    output += "<div class='menace_settings' id='_"+n+"_tweak_h'><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
-    output += "<div class='menace_settings_title'>Number of beads in each box before any games are played</div>"
+/* One engine column: title, settings toggle, sliders, matchbox grid. */
+function buildMenaceColumnHTML(n){
+    var menacename = n === 2 ? "MENACE2" : "MENACE"
+    var output = "<div class='menace-panel menace-panel-col' data-menace-col='"+n+"'>"
+    output += "<h3 class='menace-col-heading'>"+menacename+"</h3>"
+    output += "<div id='_"+n+"_tweak_s' class='menace-tweak-reveal'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"' class='menace-linkish'>Settings &#x25BC;</button></div>"
+    output += "<div class='menace_settings' id='_"+n+"_tweak_h'>"
+    output += "<div class='menace-tweak-hide'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"' class='menace-linkish'>&#x25B2; Hide settings</button></div>"
+    output += "<div class='menace-settings-inner'>"
+    output += "<div class='menace_settings_title'>Starting beads per turn</div>"
     if(n==1){
-        var im1v = Math.min(20, Math.max(1, menace[1]["start"][0]))
-        output += "First Moves: <input type='range' min='1' max='20' step='1' class='slider' id='im1' aria-label='Beads for first moves' value='"+im1v+"' /> <span id='im1_display'>"+im1v+"</span><br />"
-        output += "Third Moves: <input size=1 id='im3' /><br />"
-        output += "Fifth Moves: <input size=1 id='im5' /><br />"
-        output += "Seventh Moves: <input size=1 id='im7'><br />"
+        var s = menace[1]["start"]
+        output += menaceBeadSliderRow("im1", "1st move", s[0])
+        output += menaceBeadSliderRow("im3", "3rd move", s[1])
+        output += menaceBeadSliderRow("im5", "5th move", s[2])
+        output += menaceBeadSliderRow("im7", "7th move", s[3])
     }
     if(n==2){
-        output += "Second Moves: <input size=1 id='im2' /><br />"
-        output += "Fourth Moves: <input size=1 id='im4' /><br />"
-        output += "Sixth Moves: <input size=1 id='im6' /><br />"
-        output += "Eighth Moves: <input size=1 id='im8'><br />"
+        var s2 = menace[2]["start"]
+        output += menaceBeadSliderRow("im2", "2nd move", s2[0])
+        output += menaceBeadSliderRow("im4", "4th move", s2[1])
+        output += menaceBeadSliderRow("im6", "6th move", s2[2])
+        output += menaceBeadSliderRow("im8", "8th move", s2[3])
     }
-    output += "<label><input type='checkbox' id='_"+n+"_includeall'>Treat symmetrically equivalent moves as if they are the same move</label><br />"
-    output += "<div class='menace_settings_title'>Incentives</div>"
-    output += "Win: Add <input size=1 id='_"+n+"_ic_w' /> beads<br/>"
-    output += "Draw: Add <input size=1 id='_"+n+"_ic_d' /> beads<br/>"
-    output += "Lose: Take <input size=1 id='_"+n+"_ic_l' /> beads"
-    output += "<div class='menace_settings_title'>Update settings</div>"
-    output += "To save these settings, press this button:"
-    output += "<div><button type='button' class='menace-btn-solid' data-menace-action='update' data-menace-id='"+n+"'>Update "+menacename+"</button></div>"
-    output += "<br />To save these settings and reset MENACE to their initial state before and games are played, press this button:"
-    output += "<div><button type='button' class='menace-btn-solid' data-menace-action='update-reset' data-menace-id='"+n+"'>Update and reset "+menacename+"</button></div>"
-    output += "<br /><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
-    output += "</div>"
-    output += "<br />";
+    output += "<label class='menace-checkbox-row'><input type='checkbox' id='_"+n+"_includeall'> Merge symmetric positions</label>"
+    output += "<div class='menace_settings_title'>Bead rewards (per game)</div>"
+    var ic = menace[n]["incentives"]
+    output += menaceIncentiveSliderRow(n, "w", "Win", ic[1], 0, 20)
+    output += menaceIncentiveSliderRow(n, "d", "Draw", ic[0], 0, 20)
+    output += menaceIncentiveSliderRow(n, "l", "Lose", -ic[2], 0, 20)
+    output += "<div class='menace-settings-actions'>"
+    output += "<button type='button' class='menace-btn-solid' data-menace-action='update' data-menace-id='"+n+"'>Save settings</button>"
+    output += "<button type='button' class='menace-btn-solid menace-btn-warn' data-menace-action='update-reset' data-menace-id='"+n+"'>Save &amp; reset "+menacename+"</button>"
+    output += "</div></div></div>"
     var boxout = ""
     var numb = 0
     for(var move=0;move<menace[n]["orderedBoxes"].length;move++){
         var moven = move * 2 + n;
+        var ord = menace[n]["orderedBoxes"][move]
         if(moven == 1){
-            boxout += "This box is for the first move:";
+            boxout += "<div class='menace-move-group'>1st move &middot; 1 box</div>";
         } else {
-            boxout += "These "+menace[n]["orderedBoxes"][move].length+" boxes are for the "
-            if(moven == 2){boxout += "second"} else
-            if(moven == 3){boxout += "third"} else
-            if(moven == 4){boxout += "fourth"} else
-            if(moven == 5){boxout += "fifth"} else
-            if(moven == 6){boxout += "sixth"} else
-            if(moven == 7){boxout += "seventh"} else
-            if(moven == 8){boxout += "eighth"} else
-            if(moven == 9){boxout += "ninth"}
-            boxout += " move:"
+            var ordWord = ["","second","third","fourth","fifth","sixth","seventh","eighth","ninth"][moven-1] || ("move "+moven)
+            boxout += "<div class='menace-move-group'>"+ordWord+" move &middot; "+ord.length+" boxes</div>";
         }
-        boxout += "<br />";
         var cols = 0
-        boxout += "<div class='center'><table class='moves'>"
-        for(var k=0;k<menace[n]["orderedBoxes"][move].length;k++){
-            var key = menace[n]["orderedBoxes"][move][k]
+        boxout += "<div class='menace-moves-wrap'><table class='moves'>"
+        for(var k=0;k<ord.length;k++){
+            var key = ord[k]
             if(cols == 0){
                 boxout += "<tr>"
             }
             cols += 1
             numb += 1
-            boxout += "<td class='board' id='board"+key+"'>"+make_ox(key,n)+"</td>"
+            boxout += "<td class='board' id='m"+n+"_board_"+key+"'>"+make_ox(key,n)+"</td>"
             if(cols == 7){
                 boxout += "</tr>"
                 cols = 0
@@ -130,34 +131,100 @@ function show_menace(n){
         if(cols != 0){
             boxout += "</tr>"
         }
-        boxout += "</table></div><br /><br />"
+        boxout += "</table></div>"
     }
-    output += "This box shows all " + numb + " matchboxes that make up "+menacename+".<br /><br />"
+    output += "<p class='menace-matchbox-intro'><strong>"+numb+"</strong> matchboxes total</p>"
     output += boxout
-    output += "<br /><br />";
     output += "</div>"
-    document.getElementById("_"+n+"_moves").innerHTML = output
+    return output
+}
+
+/* One bordered region: pop-out control + two columns (O learner | X learner). */
+function showMenacePanels(){
+    var root = document.getElementById("menace_panels_root")
+    if(!root){ return }
+    var html = "<div class='menace-combined-box'>"
+    html += "<div class='menace-combined-toolbar'>"
+    html += "<button type='button' data-menace-action='popout-panels' class='menace-popout-btn'>Pop out</button>"
+    html += "</div>"
+    html += "<div class='menace-two-columns'>"
+    html += buildMenaceColumnHTML(1)
+    html += buildMenaceColumnHTML(2)
+    html += "</div></div>"
+    root.innerHTML = html
 }
 
 function hide_menace(n){
-    document.getElementById("_"+n+"_moves").innerHTML = ""
+    /* Legacy: both engines live in one host; clearing n only is unused. */
+    if(n === 1 || n === 2){
+        var root = document.getElementById("menace_panels_root")
+        if(root){ root.innerHTML = "" }
+    }
 }
 
-function syncIm1SliderDisplay(){
-    var el = document.getElementById("im1")
-    var disp = document.getElementById("im1_display")
-    if(el && disp){
-        disp.textContent = el.value
+function openMenacePanelsPopup(){
+    var host = document.getElementById("menace_panels_root")
+    if(!host){ return }
+    var cssUrl = new URL("styles.css", window.location.href).href
+    var w = window.open("", "menaceMatchboxes", "width=1100,height=720,scrollbars=yes,resizable=yes")
+    if(!w){ return }
+    w.document.open()
+    w.document.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>MENACE matchboxes</title>")
+    w.document.write("<link rel=\"stylesheet\" href=\""+cssUrl+"\">")
+    w.document.write("</head><body class=\"menace-popup-body\">")
+    w.document.write(host.innerHTML)
+    w.document.write("<p class=\"menace-popup-note\"><em>View only.</em> Use the main window to play and change settings; reopen this window to refresh the view.</p>")
+    w.document.write("</body></html>")
+    w.document.close()
+}
+
+/* id e.g. im1; value clamped 1..20 for initial HTML in show_menace. */
+function menaceBeadSliderRow(id, label, v){
+    v = Math.min(20, Math.max(1, v))
+    return "<div class='menace-slider-row'><span class='menace-slider-label'>"+label+"</span><input type='range' min='1' max='20' step='1' class='slider menace-settings-slider' id='"+id+"' aria-label='"+label+"' value='"+v+"' /><span class='menace-slider-num' id='"+id+"_display'>"+v+"</span></div>"
+}
+
+/* kind: w | d | l — paired span id is _n_ic_w_display etc. */
+function menaceIncentiveSliderRow(n, kind, label, v, min, max){
+    v = Math.min(max, Math.max(min, v))
+    var sid = "_"+n+"_ic_"+kind
+    var unit = v === 1 ? "bead" : "beads"
+    var tail
+    if(kind === "l"){
+        tail = "take <span id='"+sid+"_display'>"+v+"</span> <span class='menace-ic-unit' id='"+sid+"_unit'>"+unit+"</span>"
+    } else {
+        tail = "+<span id='"+sid+"_display'>"+v+"</span> <span class='menace-ic-unit' id='"+sid+"_unit'>"+unit+"</span>"
     }
+    return "<div class='menace-slider-row menace-ic-row'><span class='menace-slider-label'>"+label+"</span><input type='range' min='"+min+"' max='"+max+"' step='1' class='slider menace-settings-slider' id='"+sid+"' aria-label='"+label+"' value='"+v+"' /><span class='menace-ic-value'>"+tail+"</span></div>"
+}
+
+function syncMenaceSettingSliderDisplay(el){
+    if(!el || el.type !== "range" || !el.classList.contains("menace-settings-slider")){ return }
+    var disp = document.getElementById(el.id + "_display")
+    if(disp){ disp.textContent = el.value }
+    var unit = document.getElementById(el.id + "_unit")
+    if(unit){
+        var nv = parseInt(el.value, 10)
+        unit.textContent = nv === 1 ? "bead" : "beads"
+    }
+}
+
+/* show_menace(n) kept as alias for single-column refresh — rebuilds full combined panel. */
+function show_menace(n){
+    showMenacePanels()
 }
 
 /* One listener for dynamically created settings buttons (CSP: no inline handlers). */
 function onMenaceDelegatedClick(e) {
     var el = e.target.closest("[data-menace-action]")
     if (!el) return
+    var action = el.getAttribute("data-menace-action")
+    if (action === "popout-panels") {
+        openMenacePanelsPopup()
+        return
+    }
     var id = parseInt(el.getAttribute("data-menace-id"), 10)
     if (id !== 1 && id !== 2) return
-    var action = el.getAttribute("data-menace-action")
     if (action === "show-settings") show_set(id)
     else if (action === "hide-settings") hide_set(id)
     else if (action === "update") update_set(id)

@@ -167,54 +167,242 @@ table.board td button {
   margin-top: 0.25rem;
 }
 
-.menace_settings input.slider[type="range"] {
-  vertical-align: middle;
-  max-width: 12rem;
-}
-
 .moves-container {
   position: absolute;
   right: 5px;
+  top: 10px;
+  max-width: min(68vw, 820px);
+  max-height: calc(100vh - 20px);
+  overflow: auto;
+  border: 1px solid #999;
+  padding: 10px 12px;
+  background: #fafafa;
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  line-height: 1.35;
 }
 
-.menace_settings {
-  display: none;
+.menace-combined-toolbar {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #ddd;
 }
 
-.menace-panel .center {
+.menace-popout-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.menace-two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+  align-items: start;
+}
+
+.menace-two-columns > .menace-panel-col:first-child {
+  padding-right: 6px;
+}
+
+.menace-two-columns > .menace-panel-col:nth-child(2) {
+  border-left: 1px solid #ddd;
+  padding-left: 14px;
+}
+
+.menace-panel-col {
+  min-width: 0;
+}
+
+.menace-col-heading {
+  margin: 0 0 0.4rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+}
+
+.menace-tweak-reveal,
+.menace-tweak-hide {
+  margin-bottom: 0.35rem;
+}
+
+.menace-settings-inner {
+  padding-top: 0.15rem;
+}
+
+.menace-slider-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin-bottom: 0.28rem;
+  min-height: 1.5rem;
+}
+
+.menace-slider-label {
+  flex: 0 0 4.5rem;
+  min-width: 0;
+  text-align: right;
+  font-size: 0.82rem;
+  color: #222;
+}
+
+.menace_settings input.menace-settings-slider[type="range"],
+.menace-settings-inner input.menace-settings-slider[type="range"] {
+  flex: 1 1 4rem;
+  min-width: 56px;
+  max-width: 100%;
+  width: 100%;
+  vertical-align: middle;
+  height: 1.1rem;
+}
+
+.menace-slider-num {
+  flex: 0 0 1.25rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+}
+
+.menace-ic-value {
+  flex: 0 1 auto;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  color: #333;
+}
+
+.menace-ic-unit {
+  font-size: inherit;
+}
+
+.menace-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0.4rem 0;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.menace-checkbox-row input {
+  margin-top: 0.12rem;
+  flex-shrink: 0;
+}
+
+.menace-settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.55rem;
+}
+
+.menace-settings-actions .menace-btn-solid {
+  width: 100%;
   text-align: center;
+  margin: 0;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.82rem;
 }
 
-.menace-panel button[data-menace-action] {
+.menace-btn-warn {
+  border-color: #a65;
+  background: #fff8f5;
+}
+
+.menace-matchbox-intro {
+  margin: 0.65rem 0 0.35rem 0;
+  padding-top: 0.35rem;
+  border-top: 1px solid #e8e8e8;
+  font-size: 0.82rem;
+  color: #444;
+}
+
+.menace-move-group {
+  margin: 0.45rem 0 0.2rem 0;
+  font-size: 0.78rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.menace-moves-wrap {
+  overflow-x: auto;
+  margin-bottom: 0.25rem;
+}
+
+.menace-moves-wrap table.moves {
+  margin: 0 auto;
+}
+
+.menace-linkish {
   background: none;
   border: none;
   color: #0000ee;
   cursor: pointer;
   text-decoration: underline;
   font: inherit;
+  font-size: 0.85rem;
   padding: 0;
 }
 
-.menace-panel button[data-menace-action]:hover {
+.menace-linkish:hover {
   color: #551a8b;
+}
+
+@media (max-width: 700px) {
+  .moves-container {
+    max-width: calc(100vw - 12px);
+  }
+
+  .menace-two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .menace-two-columns > .menace-panel-col:nth-child(2) {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+}
+
+body.menace-popup-body {
+  padding: 12px;
+  margin: 0;
+  font-family: serif;
+}
+
+.menace-popup-note {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.menace_settings {
+  display: none;
 }
 
 .menace-panel button[type="button"].menace-btn-solid {
   display: inline-block;
-  margin: 0.25rem 0;
-  padding: 0.25rem 0.5rem;
   border: 1px solid #666;
-  background: #f5f5f5;
+  background: #f0f0f0;
   color: #000;
   text-decoration: none;
   cursor: pointer;
+  border-radius: 2px;
 }
 
 .menace-panel button[type="button"].menace-btn-solid:hover {
-  background: #e8e8e8;
+  background: #e4e4e4;
 }
 
 .menace_settings_title {
   font-weight: bold;
-  margin-top: 0.5rem;
+  margin: 0.55rem 0 0.25rem 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555;
 }
