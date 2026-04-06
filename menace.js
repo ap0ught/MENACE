@@ -516,8 +516,8 @@ function show_menace(n){
         menacename += "2"
     }
     var output = "<div class='menace-panel'>"
-    output += "<span id='_"+n+"_tweak_s'><div class='center'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"'>&#x25BC; Show "+menacename+"'s settings &#x25BC;</button></div></span>"
-    output += "<span class='menace_settings' id='_"+n+"_tweak_h' style='display:none'><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
+    output += "<div id='_"+n+"_tweak_s'><div class='center'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"'>&#x25BC; Show "+menacename+"'s settings &#x25BC;</button></div></div>"
+    output += "<div class='menace_settings' id='_"+n+"_tweak_h'><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
     output += "<div class='menace_settings_title'>Number of beads in each box before any games are played</div>"
     if(n==1){
         output += "First Moves: <input size=1 id='im1' /><br />"
@@ -542,7 +542,7 @@ function show_menace(n){
     output += "<br />To save these settings and reset MENACE to their initial state before and games are played, press this button:"
     output += "<div><button type='button' class='menace-btn-solid' data-menace-action='update-reset' data-menace-id='"+n+"'>Update and reset "+menacename+"</button></div>"
     output += "<br /><div class='center'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"'>&#x25B2; Hide "+menacename+"'s settings &#x25B2;</button></div>"
-    output += "</span>"
+    output += "</div>"
     output += "<br />";
     var boxout = ""
     var numb = 0

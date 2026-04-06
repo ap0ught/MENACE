@@ -26,7 +26,7 @@ This program uses the same idea with **virtual matchboxes**: each position store
 ## Quick start
 
 1. Clone or download this repository.
-2. Open `**index.html`** in a modern browser (Chrome, Firefox, Edge, etc.).
+2. Open `index.html` in a modern browser (Chrome, Firefox, Edge, etc.).
 
 If your browser blocks local scripts when opening files directly, serve the folder instead, for example:
 

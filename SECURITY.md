@@ -9,7 +9,7 @@ This project is a **static, client-only** tic-tac-toe demo. It does not send dat
 - **Content-Security-Policy** (CSP) in `index.html` restricts scripts and styles to same-origin files only, blocks frames, plugins, and network fetches from the page, and disallows dangerous URL handlers (`javascript:`) by omitting `'unsafe-inline'` for scripts.
 - **No inline script handlers** — UI actions use `addEventListener` and delegated clicks on `data-menace-action` buttons instead of `javascript:` links or inline `onsubmit`.
 - **Text-first UI updates** where practical — status lines and scores use `textContent` instead of HTML concatenation to avoid accidental markup injection.
-- `**referrer`** meta set to `strict-origin-when-cross-origin`.
+- `referrer` meta set to `strict-origin-when-cross-origin`.
 - **Dependencies** — none; there is nothing to keep “up to date” via a lockfile. If you fork and add a build tool or CDN assets, pin versions and run your ecosystem’s audit (e.g. `npm audit`).
 
 ## Reporting

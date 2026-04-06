@@ -133,6 +133,15 @@ table.board td button {
   text-align: left;
 }
 
+.moves-container {
+  position: absolute;
+  right: 5px;
+}
+
+.menace_settings {
+  display: none;
+}
+
 .menace-panel .center {
   text-align: center;
 }
