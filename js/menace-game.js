@@ -3,12 +3,12 @@
 /* Turn order: MENACE (1) then X.    */
 /*************************************/
 
-/* Empty cell on main grid; human sees CSS watermark only, AI modes get invisible click target. */
+/* Empty cell on main grid; adds a click button in human mode, CSS watermark label only otherwise. */
 function mainBoardCellClear(i){
     var td = document.getElementById("pos"+i)
     td.textContent = ""
     td.classList.remove("has-mark")
-    if(player != "h"){
+    if(player == "h"){
         var btn = document.createElement("button")
         btn.type = "button"
         btn.setAttribute("aria-label", "Play cell " + td.getAttribute("data-cell-n"))

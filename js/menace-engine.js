@@ -69,7 +69,7 @@ function reset_menace(n){
     for(var i=1;i<=2;i++){
         if(n==i || n=="both"){
             menace[i]["orderedBoxes"] = [[],[],[],[]]
-            menace[i]["boxes"] = []
+            menace[i]["boxes"] = {}
         }
     }
     if(n == 1 || n == "both"){
