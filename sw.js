@@ -64,7 +64,12 @@ self.addEventListener("fetch", (event) => {
           return response;
         }
         const copy = response.clone();
-        caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy));
+        event.waitUntil(
+          caches
+            .open(CACHE_VERSION)
+            .then((cache) => cache.put(request, copy))
+            .catch(() => {}),
+        );
         return response;
       });
     }),
