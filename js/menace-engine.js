@@ -52,7 +52,7 @@ function search_moves(b, n){
                     add_box(newboard.join(""),other,Math.floor(played/2))
                 }
             }
-                if(played < 8){
+                if(played < 7){
                     search_moves(newboard,n)
                 }
         }

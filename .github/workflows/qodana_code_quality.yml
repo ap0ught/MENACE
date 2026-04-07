@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - master
+      - main
       - cursor/split-menace-js-and-ui-updates
 
 jobs:

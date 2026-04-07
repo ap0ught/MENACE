@@ -2,8 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { JSDOM } from 'jsdom'
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
-const panelJs = fs.readFileSync(path.resolve(__dirname, './js/menace-ui-panel.js'), 'utf8')
+const currentDir = path.dirname(fileURLToPath(import.meta.url))
+const panelJs = fs.readFileSync(path.resolve(currentDir, './js/menace-ui-panel.js'), 'utf8')
 
 describe('menace-ui-panel.js', () => {
   let dom

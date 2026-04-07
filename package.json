@@ -4,7 +4,7 @@
   "description": "**Machine Educable Noughts And Crosses Engine** — a browser-based tic-tac-toe demo where an AI learns by reinforcement, inspired by Donald Michie’s 1960 matchbox computer.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/ap0ught/MENACE/issues"
   },

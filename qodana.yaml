@@ -23,10 +23,7 @@ profile:
 #    paths:
 #      - <path/where/not/run/inspection>
 
-projectJDK: "24" #(Applied in CI/CD pipeline)
-
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
-#bootstrap: sh ./prepare-qodana.sh
 
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:
@@ -46,4 +43,4 @@ projectJDK: "24" #(Applied in CI/CD pipeline)
   
 #Qodana supports other languages, for example, Python, JavaScript, TypeScript, Go, C#, PHP
 #For all supported languages see https://www.jetbrains.com/help/qodana/linters.html
-linter: jetbrains/qodana-jvm-community:2026.1
+linter: jetbrains/qodana-js:2026.1

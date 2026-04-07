@@ -83,7 +83,7 @@ function do_win(who_wins){
         }
     }
     menace_add_beads(who_wins)
-    menaceSaveStateToStorage()
+    menaceScheduleSave()
     if(player == "h"){
         window.setTimeout(new_game, 1000)
     } else {

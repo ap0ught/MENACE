@@ -4,7 +4,35 @@
 
 var MENACE_STORAGE_KEY = "menace_app_state_v1"
 
+function menaceIsObject(value){
+    return value !== null && typeof value === "object"
+}
+
+function menaceIsArrayOfArrays(value){
+    if(!Array.isArray(value)){ return false }
+    for(var i=0;i<value.length;i++){
+        if(!Array.isArray(value[i])){ return false }
+    }
+    return true
+}
+
+function menaceIsValidLoadedPlayerState(state){
+    return menaceIsObject(state) &&
+        menaceIsObject(state.boxes) &&
+        menaceIsArrayOfArrays(state.orderedBoxes) &&
+        Array.isArray(state.start) &&
+        typeof state.removesymm === "boolean" &&
+        Array.isArray(state.incentives)
+}
+
+var _menaceSaveTimer = null
+function menaceScheduleSave(){
+    if(_menaceSaveTimer){ clearTimeout(_menaceSaveTimer) }
+    _menaceSaveTimer = setTimeout(menaceSaveStateToStorage, 500)
+}
+
 function menaceSaveStateToStorage(){
+    _menaceSaveTimer = null
     try{
         var payload = {
             v: 1,
@@ -35,6 +63,14 @@ function menaceTryLoadFromStorage(){
         if(!raw){ return false }
         var o = JSON.parse(raw)
         if(o.v !== 1 || !o.m1 || !o.m2){ return false }
+        if(
+            !menaceIsValidLoadedPlayerState(o.m1) ||
+            !menaceIsValidLoadedPlayerState(o.m2) ||
+            !Array.isArray(o.plotdata) ||
+            !Array.isArray(o.wins_each)
+        ){
+            return false
+        }
         menace[1].boxes = o.m1.boxes
         menace[1].orderedBoxes = o.m1.orderedBoxes
         menace[1].start = o.m1.start
