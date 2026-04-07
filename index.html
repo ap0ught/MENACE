@@ -18,6 +18,10 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="human-move" id="human_move_wrap" hidden>
+  <label for="human_cell_input">Your move (1–9): top row 7–9, bottom row 1–3. A valid digit applies immediately.</label><br />
+  <input type="text" id="human_cell_input" maxlength="1" inputmode="numeric" pattern="[1-9]" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Cell number 1 to 9 for your move" />
+</div>
 <div class="moves-container" id="menace_panels_root" aria-label="MENACE and MENACE2 matchbox panels"></div>
 <table class="board large">
 <tr>
@@ -42,10 +46,6 @@
 <option value="m">MENACE2</option>
 <option value="p">Perfect</option>
 </select></div>
-<div class="human-move" id="human_move_wrap" hidden>
-  <label for="human_cell_input">Your move (1–9): top row 7–9, bottom row 1–3. A valid digit applies immediately.</label><br />
-  <input type="number" id="human_cell_input" min="1" max="9" step="1" inputmode="numeric" aria-label="Cell number 1 to 9 for your move" />
-</div>
 <div class="wins" id="n1"><small>MENACE Wins</small><div class="dis" id="dis1">0</div></div>
 <div class="wins" id="n2"><small>Draws</small><div class="dis" id="dis0">0</div></div>
 <div class="wins" id="n3"><small><span id="who">Human</span> Wins</small><div class="dis" id="dis2">0</div></div>

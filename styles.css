@@ -162,7 +162,7 @@ table.board td button {
   max-width: 200px;
 }
 
-.human-move input[type="number"] {
+.human-move input[type="text"] {
   width: 4rem;
   margin-top: 0.25rem;
 }
