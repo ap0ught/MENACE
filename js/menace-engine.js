@@ -48,7 +48,7 @@ function search_moves(b, n){
             var newboard = b.slice()
             newboard[i] = move
             if(n == other || n == "both"){
-                if(winner(newboard) === false && rotation_is_max(newboard)){
+                if(winner(newboard) === false && rotation_is_max(newboard.join(""))){
                     add_box(newboard.join(""),other,Math.floor(played/2))
                 }
             }
@@ -91,10 +91,7 @@ function reset_menace(n){
             order_boxes(i)
         }
     }
-    show_menace(1)
-    if(player=="m"){
-        show_menace(2)
-    }
+    showMenacePanels()
     new_game()
 }
 
@@ -134,7 +131,7 @@ function menace_add_beads(result){
     for(var i=0;i<menace[1]["moves"].length;i++){
         box_add(menace[1]["moves"][i][0],menace[1]["moves"][i][1],menace[1]["incentives"][result],1)
     }
-    if(player=="m"){
+    if(player=="m" || player=="h"){
         for(var i=0;i<menace[2]["moves"].length;i++){
             box_add(menace[2]["moves"][i][0],menace[2]["moves"][i][1],menace[2]["incentives"][opposite_result(result)],2)
         }
@@ -158,11 +155,33 @@ function get_menace_move(n){
         var plays = menace[n]["boxes"][pos]
         var where = make_move(plays)
         if(where == "resign"){return "resign"}
-        document.getElementById(pos+"-"+where).style.color = "#FF0000"
-        var inv_where = rotations[which_rot][where]
+        var hl = document.getElementById("m"+n+"-"+pos+"-"+where)
+        if(hl){ hl.style.color = "#FF0000" }
+        inv_where = rotations[which_rot][where]
         menace[n]["moves"].push([pos,where])
     }
     return inv_where
+}
+
+/* Human X: record move in MENACE2’s trace (canonical pos + slot), mirroring get_menace_move(2). */
+function recordMenace2HumanMove(boardBefore, realWhere){
+    if(count(boardBefore,0) == 1){
+        return
+    }
+    var posStr = boardBefore.join("")
+    var which_rot = find_rotation(posStr)
+    var posCanon = apply_rotation(posStr,rotations[which_rot])
+    var whereCanon = -1
+    for(var j=0;j<9;j++){
+        if(rotations[which_rot][j] == realWhere){
+            whereCanon = j
+            break
+        }
+    }
+    if(whereCanon < 0){ return }
+    menace[2]["moves"].push([posCanon, whereCanon])
+    var hl = document.getElementById("m2-"+posCanon+"-"+whereCanon)
+    if(hl){ hl.style.color = "#FF0000" }
 }
 
 /* Stochastic choice: index i with probability plays[i] / sum(plays). */

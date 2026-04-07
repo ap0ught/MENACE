@@ -43,11 +43,6 @@ function new_game(){
 function setPlayer(setTo){
     player = setTo
     document.getElementById("who").textContent = whoA[setTo]
-    if(setTo=="m"){
-        show_menace(2)
-    } else {
-        hide_menace(2)
-    }
     if(setTo!="h"){
         document.getElementById("speeddiv").style.display = "block"
     } else {
@@ -88,10 +83,12 @@ function do_win(who_wins){
         }
     }
     menace_add_beads(who_wins)
+    menaceScheduleSave()
     if(player == "h"){
         window.setTimeout(new_game, 1000)
     } else {
-        window.setTimeout(new_game, -parseInt(document.getElementById("speed_slider").value))
+        var delay = Math.abs(parseInt(document.getElementById("speed_slider").value, 10))
+        window.setTimeout(new_game, delay)
     }
 }
 
@@ -140,7 +137,8 @@ function play_opponent(){
     check_win()
     if(no_winner){
         /* Slight delay so the human can follow automated play. */
-        window.setTimeout(play_menace, -parseInt(document.getElementById("speed_slider").value)/10)
+        var delay = Math.abs(parseInt(document.getElementById("speed_slider").value, 10))
+        window.setTimeout(play_menace, delay / 10)
     }
 }
 
@@ -151,6 +149,8 @@ function play_human(where){
     if(board[where] !== 0){
         return
     }
+    var boardBefore = board.slice()
+    recordMenace2HumanMove(boardBefore, where)
     human_turn = false
     board[where] = 2
     mainBoardCellPlacePiece(where, 2)

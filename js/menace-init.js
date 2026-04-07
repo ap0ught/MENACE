@@ -11,20 +11,30 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     document.addEventListener("click", onMenaceDelegatedClick)
     document.addEventListener("input", function (e) {
-        if(e.target && e.target.id === "im1"){
-            syncIm1SliderDisplay()
+        var t = e.target
+        if(t && t.type === "range" && t.classList.contains("menace-settings-slider")){
+            syncMenaceSettingSliderDisplay(t)
         }
     })
     var hci = document.getElementById("human_cell_input")
+    hci.addEventListener("input", function () {
+        var raw = String(hci.value).trim()
+        if(/^[1-9]$/.test(raw)){
+            submitHumanCellInput()
+        }
+    })
     hci.addEventListener("keydown", function (e) {
         if(e.key === "Enter"){
             e.preventDefault()
             submitHumanCellInput()
         }
     })
-    hci.addEventListener("change", function () {
-        submitHumanCellInput()
-    })
-    /* Build both engines’ matchboxes and kick off first game (MENACE opens). */
-    reset_menace("both")
+    if(menaceTryLoadFromStorage()){
+        menaceApplyLoadedScoresToDom()
+        redraw_plot()
+        showMenacePanels()
+        new_game()
+    } else {
+        reset_menace("both")
+    }
 })
