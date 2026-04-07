@@ -187,6 +187,7 @@ function submitHumanCellInput(){
     var idx = BOARD_IDX_FOR_CELL_NUM[n - 1]
     if(board[idx] !== 0){
         say("That cell is already taken.")
+        inp.value = ""
         return
     }
     if(!human_turn || player !== "h" || !no_winner){

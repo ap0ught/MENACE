@@ -18,8 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     var hci = document.getElementById("human_cell_input")
     hci.addEventListener("input", function () {
-        var raw = String(hci.value).trim()
-        if(/^[1-9]$/.test(raw)){
+        var digits = String(hci.value).replace(/[^1-9]/g, "")
+        hci.value = digits.slice(0, 1)
+        if(/^[1-9]$/.test(hci.value)){
             submitHumanCellInput()
         }
     })
@@ -37,4 +38,10 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         reset_menace("both")
     }
+    /* After layout, ensure keyboard focus is on the move field when it is active. */
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            updateHumanMoveControls()
+        })
+    })
 })
