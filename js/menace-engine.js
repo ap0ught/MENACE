@@ -74,8 +74,13 @@ function reset_menace(n){
     }
     if(n == 1 || n == "both"){
         plotdata = [0]
-        update_plot()
+        plotdata_menace2 = [0]
+        result_history = []
+        plot_cum_o = [0]
+        plot_cum_draw = [0]
+        plot_cum_x = [0]
         redraw_plot()
+        updateStreakIndicator()
         wins_each = [0,0,0]
         for (var i=0;i<3;i++) {
             document.getElementById("dis"+i).textContent = String(wins_each[i])
@@ -95,30 +100,32 @@ function reset_menace(n){
     new_game()
 }
 
-function update_set_r(n){
-    update_set(n)
+function update_set_r(n, doc){
+    update_set(n, doc)
     reset_menace(n)
 }
 
 /* Read form fields into menace[n]; does not rebuild boxes until update_set_r. */
-function update_set(n){
-    menace[n]["removesymm"] = (!document.getElementById("_"+n+"_includeall") || document.getElementById("_"+n+"_includeall").checked)
+/* doc: optional root document (e.g. popout) — defaults to main document. */
+function update_set(n, doc){
+    var d = doc || document
+    menace[n]["removesymm"] = (!d.getElementById("_"+n+"_includeall") || d.getElementById("_"+n+"_includeall").checked)
     if(n==1){
-        menace[1]["start"][0] = parseInt(document.getElementById("im1").value)
-        menace[1]["start"][1] = parseInt(document.getElementById("im3").value)
-        menace[1]["start"][2] = parseInt(document.getElementById("im5").value)
-        menace[1]["start"][3] = parseInt(document.getElementById("im7").value)
+        menace[1]["start"][0] = parseInt(d.getElementById("im1").value, 10)
+        menace[1]["start"][1] = parseInt(d.getElementById("im3").value, 10)
+        menace[1]["start"][2] = parseInt(d.getElementById("im5").value, 10)
+        menace[1]["start"][3] = parseInt(d.getElementById("im7").value, 10)
     }
     if(n==2){
-        menace[2]["start"][0] = parseInt(document.getElementById("im2").value)
-        menace[2]["start"][1] = parseInt(document.getElementById("im4").value)
-        menace[2]["start"][2] = parseInt(document.getElementById("im6").value)
-        menace[2]["start"][3] = parseInt(document.getElementById("im8").value)
+        menace[2]["start"][0] = parseInt(d.getElementById("im2").value, 10)
+        menace[2]["start"][1] = parseInt(d.getElementById("im4").value, 10)
+        menace[2]["start"][2] = parseInt(d.getElementById("im6").value, 10)
+        menace[2]["start"][3] = parseInt(d.getElementById("im8").value, 10)
     }
-    menace[n]["incentives"][1] = parseInt(document.getElementById("_"+n+"_ic_w").value)
-    menace[n]["incentives"][0] = parseInt(document.getElementById("_"+n+"_ic_d").value)
-    menace[n]["incentives"][2] = -parseInt(document.getElementById("_"+n+"_ic_l").value)
-    hide_set(n)
+    menace[n]["incentives"][1] = parseInt(d.getElementById("_"+n+"_ic_w").value, 10)
+    menace[n]["incentives"][0] = parseInt(d.getElementById("_"+n+"_ic_d").value, 10)
+    menace[n]["incentives"][2] = -parseInt(d.getElementById("_"+n+"_ic_l").value, 10)
+    hide_set(n, doc)
 }
 
 function box_add(pos,move,change,n){
@@ -128,10 +135,12 @@ function box_add(pos,move,change,n){
 
 /* After each finished game, reinforce every (pos,move) recorded in menace[*].moves. */
 function menace_add_beads(result){
-    for(var i=0;i<menace[1]["moves"].length;i++){
-        box_add(menace[1]["moves"][i][0],menace[1]["moves"][i][1],menace[1]["incentives"][result],1)
+    if((player_o === "m" || player_o === "h") && menace[1]["moves"].length){
+        for(var i=0;i<menace[1]["moves"].length;i++){
+            box_add(menace[1]["moves"][i][0],menace[1]["moves"][i][1],menace[1]["incentives"][result],1)
+        }
     }
-    if(player=="m" || player=="h"){
+    if((player_x === "m" || player_x === "h") && menace[2]["moves"].length){
         for(var i=0;i<menace[2]["moves"].length;i++){
             box_add(menace[2]["moves"][i][0],menace[2]["moves"][i][1],menace[2]["incentives"][opposite_result(result)],2)
         }
@@ -163,8 +172,8 @@ function get_menace_move(n){
     return inv_where
 }
 
-/* Human X: record move in MENACE2’s trace (canonical pos + slot), mirroring get_menace_move(2). */
-function recordMenace2HumanMove(boardBefore, realWhere){
+/* Human move: record in learner n’s trace (canonical pos + slot), mirroring get_menace_move(n). */
+function recordHumanLearnerMove(engineId, boardBefore, realWhere){
     if(count(boardBefore,0) == 1){
         return
     }
@@ -179,9 +188,13 @@ function recordMenace2HumanMove(boardBefore, realWhere){
         }
     }
     if(whereCanon < 0){ return }
-    menace[2]["moves"].push([posCanon, whereCanon])
-    var hl = document.getElementById("m2-"+posCanon+"-"+whereCanon)
+    menace[engineId]["moves"].push([posCanon, whereCanon])
+    var hl = document.getElementById("m"+engineId+"-"+posCanon+"-"+whereCanon)
     if(hl){ hl.style.color = "#FF0000" }
+}
+
+function recordMenace2HumanMove(boardBefore, realWhere){
+    recordHumanLearnerMove(2, boardBefore, realWhere)
 }
 
 /* Stochastic choice: index i with probability plays[i] / sum(plays). */

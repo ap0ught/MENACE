@@ -28,21 +28,32 @@ var menace = {
     "player":2}
 }
 
-/* Opponent for X: h human, r random, m second MENACE, p perfect minimax. */
-var player = "h"
-var whoA = {"h":"Human", "r":"Random", "m":"MENACE2", "p":"Perfect"}
+/* O (player 1) and X (player 2): h human, r random, m MENACE learner for that side (eng 1 for O, eng 2 for X), p perfect. */
+var player_o = "m"
+var player_x = "h"
+var whoA = {"h":"Human", "r":"Random", "m":"MENACE", "p":"Perfect"}
+/* When automation is paused (speed slider at 0), next callback to run after unpause. */
+var automationResumePending = null
 
-/* Learning curve: one y-value per finished game (cumulative bead incentive sum). */
+/* Learning curve: cumulative per-game outcome reward (one step per game; same convention as before). */
 var plotdata = [0]
+/* MENACE2 / Human X learner — same cumulative reward; flat when X is Random or Perfect (no training). */
+var plotdata_menace2 = [0]
+/* Per finished game: 0 draw, 1 MENACE win, 2 opponent win — used for rolling win rate. */
+var result_history = []
+/* After each game, running totals (length matches plotdata). */
+var plot_cum_o = [0]
+var plot_cum_draw = [0]
+var plot_cum_x = [0]
 var xmin = 0
 var xmax = 0
 var ymin = 0
 var ymax = 0
 
 var playagain = true
-/* wins_each[0]=draws, [1]=MENACE wins, [2]=opponent wins — matches dis0..dis2 in HTML. */
+/* wins_each[0]=draws, [1]=O wins, [2]=X wins — matches dis0..dis2 in HTML. */
 var wins_each = [0,0,0]
-/* board[i] in {0,1,2}: empty, O (MENACE), X (opponent). Index i is 0..8 left-to-right, top to bottom. */
+/* board[i] in {0,1,2}: empty, O, X. Index i is 0..8 left-to-right, top to bottom. */
 var board = [0,0,0,0,0,0,0,0,0]
 var no_winner = true
 var pieces = ["","\u25CB","\u00D7"]

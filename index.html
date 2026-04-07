@@ -40,20 +40,43 @@
     <td id="pos8" class="p8" data-cell-n="3"></td>
 </tr>
 </table>
-<div class="players">O: MENACE<br />X:<select id="p2picker" aria-label="Opponent type">
+<div class="players"><label class="player-label">O:<br /><select id="p1picker" aria-label="Player O (first move)">
 <option value="h">Human</option>
 <option value="r">Random</option>
-<option value="m">MENACE2</option>
+<option value="m">MENACE</option>
 <option value="p">Perfect</option>
-</select></div>
-<div class="wins" id="n1"><small>MENACE Wins</small><div class="dis" id="dis1">0</div></div>
+</select>
+<p class="player-help" id="p1_help" hidden></p></label>
+<label class="player-label">X:<br /><select id="p2picker" aria-label="Player X (second move)">
+<option value="h">Human</option>
+<option value="r">Random</option>
+<option value="m">MENACE</option>
+<option value="p">Perfect</option>
+</select>
+<p class="player-help" id="p2_help" hidden></p></label></div>
+<div class="wins" id="n1"><small>O wins</small><div class="dis" id="dis1">0</div></div>
 <div class="wins" id="n2"><small>Draws</small><div class="dis" id="dis0">0</div></div>
-<div class="wins" id="n3"><small><span id="who">Human</span> Wins</small><div class="dis" id="dis2">0</div></div>
+<div class="wins" id="n3"><small>X wins</small><div class="dis" id="dis2">0</div></div>
 <div class="speed" id="speeddiv">
-  Speed:<br /><input type="range" min="-1000" max="-10" value="-1000" class="slider" id="speed_slider" aria-label="Game speed for automated opponent">
+  Speed (pause ← → fast):<br /><input type="range" min="0" max="1000" value="1000" step="10" class="slider" id="speed_slider" aria-label="Automated play speed; left is pause">
 </div>
 <div class="summary" id="list_here"></div>
-<canvas class="graph" id="plot_here" width="440" height="300" aria-label="Learning progress graph"></canvas>
+<div class="graph-section" id="graph_section">
+<div class="streak-indicator-wrap">
+<div id="streak_indicator" class="streak-indicator" role="text" aria-label="Recent game outcomes, oldest on the left"></div>
+</div>
+<div class="graph-controls">
+<label for="plot_mode">Chart</label>
+<select id="plot_mode" aria-label="Chart type">
+<option value="beads">Reinforcement (both learners)</option>
+<option value="wins">Cumulative wins &amp; draws</option>
+<option value="rate">Rolling win rate</option>
+</select>
+<label id="plot_window_label" for="plot_window" hidden>Window</label>
+<input type="number" id="plot_window" min="3" max="2000" value="50" title="Games in rolling average" aria-label="Rolling window size in games" hidden />
+</div>
+<canvas class="graph" id="plot_here" width="500" height="316" aria-label="Learning and statistics graphs"></canvas>
+</div>
 <script src="js/menace-state.js" defer></script>
 <script src="js/menace-utils.js" defer></script>
 <script src="js/menace-rules.js" defer></script>

@@ -43,8 +43,9 @@ describe('menace-ui-panel.js', () => {
       }
     }
     global.pieces = ["", "O", "X"]
-    global.whoA = { "h": "Human", "r": "Random", "m": "MENACE2", "p": "Perfect" }
-    global.player = "h"
+    global.whoA = { "h": "Human", "r": "Random", "m": "MENACE", "p": "Perfect" }
+    global.player_o = "m"
+    global.player_x = "h"
 
     // Execute the script in the mocked global context
     const script = new window.Function(panelJs + "\n" + 
