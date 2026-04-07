@@ -24,11 +24,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Replaces the default cache id in sw.js so each deploy invalidates the old precache.
+      - name: Stamp service worker cache version
+        run: |
+          VER="menace-pwa-${GITHUB_RUN_NUMBER}-$(echo "$GITHUB_SHA" | cut -c1-7)"
+          sed -i "s/\"menace-pwa-v1\"/\"${VER}\"/" sw.js
+          grep -q "$VER" sw.js
+
       - name: Prepare site bundle
         run: |
           mkdir -p site
-          cp index.html styles.css site/
-          cp -r js site/
+          cp index.html styles.css manifest.webmanifest sw.js site/
+          cp -r js icons site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

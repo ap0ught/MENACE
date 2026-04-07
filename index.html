@@ -4,8 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; img-src 'none'; connect-src 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+<meta name="theme-color" content="#2d3748">
+<meta name="description" content="Machine Educable Noughts And Crosses Engine — a browser tic-tac-toe demo where an AI learns by reinforcement.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MENACE">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; img-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; script-src 'self'; style-src 'self' 'unsafe-inline';">
 <title>MENACE: Machine Educable Noughts And Crosses Engine</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -56,6 +65,7 @@
 <script src="js/menace-opponents.js" defer></script>
 <script src="js/menace-game.js" defer></script>
 <script src="js/menace-init.js" defer></script>
+<script src="js/pwa-register.js" defer></script>
 
 </body>
 </html>
