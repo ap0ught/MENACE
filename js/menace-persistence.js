@@ -34,6 +34,7 @@ function menaceMigratePlotStateFromV1(){
     while(result_history.length < g){
         result_history.push(0)
     }
+    role_events = []
     for(var i=1;i<g;i++){
         plot_cum_o.push(Math.round(wins_each[1]*i/g))
         plot_cum_draw.push(Math.round(wins_each[0]*i/g))
@@ -96,6 +97,7 @@ function menaceSaveStateToStorage(){
             plot_cum_o: plot_cum_o.slice(),
             plot_cum_draw: plot_cum_draw.slice(),
             plot_cum_x: plot_cum_x.slice(),
+            role_events: role_events.slice(),
             wins_each: wins_each.slice()
         }
         localStorage.setItem(MENACE_STORAGE_KEY, JSON.stringify(payload))
@@ -145,6 +147,11 @@ function menaceTryLoadFromStorage(){
             plot_cum_o = o.plot_cum_o
             plot_cum_draw = o.plot_cum_draw
             plot_cum_x = o.plot_cum_x
+            if(Array.isArray(o.role_events)){
+                role_events = o.role_events
+            } else {
+                role_events = []
+            }
         } else {
             menaceMigratePlotStateFromV1()
         }

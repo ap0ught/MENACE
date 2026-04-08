@@ -150,8 +150,19 @@ function updatePlayerModeHelp(){
 function syncPlayersFromPickers(){
     var p1 = document.getElementById("p1picker")
     var p2 = document.getElementById("p2picker")
+    var oldO = player_o
+    var oldX = player_x
     if(p1){ player_o = p1.value }
     if(p2){ player_x = p2.value }
+    /* Log role-change annotations at the current game index. */
+    if(player_o !== oldO){
+        role_events.push({ x: plotdata.length - 1, side: 1, mode: player_o })
+        menaceScheduleSave()
+    }
+    if(player_x !== oldX){
+        role_events.push({ x: plotdata.length - 1, side: 2, mode: player_x })
+        menaceScheduleSave()
+    }
     updatePlayerModeHelp()
     updateSpeedVisibility()
     updateHumanMoveControls()

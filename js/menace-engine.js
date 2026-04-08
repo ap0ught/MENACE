@@ -79,6 +79,7 @@ function reset_menace(n){
         plot_cum_o = [0]
         plot_cum_draw = [0]
         plot_cum_x = [0]
+        role_events = []
         redraw_plot()
         updateStreakIndicator()
         wins_each = [0,0,0]

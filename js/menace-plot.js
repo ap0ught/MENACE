@@ -162,6 +162,45 @@ function drawLegend(c, ctx, items){
     }
 }
 
+function roleModeLabel(m){
+    return (m === "h") ? "Human" : (m === "r") ? "Random" : (m === "m") ? "MENACE" : (m === "p") ? "Perfect" : String(m)
+}
+
+function roleEventColor(mode, side){
+    /* Match chart semantics: O is always blue; X is red in reinforcement mode, green otherwise. */
+    if(side === 1){ return "#2563eb" }
+    if(mode === "beads"){ return "#dc2626" }
+    return "#16a34a"
+}
+
+function drawRoleEvents(c, ctx, mode){
+    if(!role_events || !role_events.length){ return }
+    ctx.save()
+    ctx.font = "11px sans-serif"
+    ctx.textAlign = "left"
+    /* Avoid stacking too much text: stagger callouts by event index. */
+    var baseY = PLOT_PAD_T + 8
+    for(var i=0;i<role_events.length;i++){
+        var ev = role_events[i]
+        if(!ev || typeof ev.x !== "number"){ continue }
+        if(ev.x < xmin || ev.x > xmax){ continue }
+        var x = xtopx(c, ev.x)
+        var color = roleEventColor(mode, ev.side)
+        ctx.strokeStyle = color
+        ctx.globalAlpha = 0.6
+        ctx.beginPath()
+        ctx.moveTo(x, PLOT_PAD_T)
+        ctx.lineTo(x, c.height - PLOT_PAD_B)
+        ctx.stroke()
+        ctx.globalAlpha = 1
+        ctx.fillStyle = color
+        var y = baseY + (i % 3) * 12
+        var label = (ev.side === 1 ? "O: " : "X: ") + roleModeLabel(ev.mode)
+        ctx.fillText(label, x + 4, y)
+    }
+    ctx.restore()
+}
+
 function strokeSeries(c, ctx, yarr, color){
     var first = -1
     for(var a=0;a<yarr.length;a++){
@@ -199,6 +238,7 @@ function redraw_plot(){
     updateplotlimits(mode)
 
     drawAxesAndTicks(c, ctx, mode)
+    drawRoleEvents(c, ctx, mode)
 
     ctx.save()
     ctx.translate(PLOT_PAD_L + plotW(c) / 2, 12)

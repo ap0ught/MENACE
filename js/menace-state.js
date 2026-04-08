@@ -47,6 +47,8 @@ var result_history = []
 var plot_cum_o = [0]
 var plot_cum_draw = [0]
 var plot_cum_x = [0]
+/* Role-change annotations: { x: gameIndex, side: 1|2, mode: 'h'|'r'|'m'|'p' }. */
+var role_events = []
 var xmin = 0
 var xmax = 0
 var ymin = 0
