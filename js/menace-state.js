@@ -4,7 +4,13 @@
 /* these globals exist.              */
 /*************************************/
 
-/* Two learners: 1 = MENACE (O), 2 = MENACE2 when enabled (X).
+/*
+ * Engine indices (fixed; do not swap):
+ *   menace[1]  — MENACE O — noughts, odd moves; DOM/data-menace-id="1"; saved as m1.
+ *   menace[2]  — MENACE X — crosses, even moves; DOM/data-menace-id="2"; saved as m2.
+ * Reinforcement chart: plotdata ↔ engine 1; plotdata_menace2 ↔ engine 2 (X learner).
+ */
+/* Two learners: 1 = MENACE O (noughts), 2 = MENACE X (crosses).
    boxes[posString] = array of 9 bead counts (legal moves only, after symmetry).
    orderedBoxes[0..3] = position keys grouped by move number (1st/2nd/… in that engine).
    start[0..3] = initial beads for 1st, 3rd, 5th, 7th moves (engine 1) or 2nd/4th/6th/8th (engine 2).
@@ -39,9 +45,9 @@ var automationTimeoutId = null
 
 /* Learning curve: cumulative per-game outcome reward (one step per game; same convention as before). */
 var plotdata = [0]
-/* MENACE2 / Human X learner — same cumulative reward; flat when X is Random or Perfect (no training). */
+/* MENACE X / Human X learner — same cumulative reward; flat when X is Random or Perfect (no training). */
 var plotdata_menace2 = [0]
-/* Per finished game: 0 draw, 1 MENACE win, 2 opponent win — used for rolling win rate. */
+/* Per finished game: 0 draw, 1 O win, 2 X win — used for rolling win rate. */
 var result_history = []
 /* After each game, running totals (length matches plotdata). */
 var plot_cum_o = [0]

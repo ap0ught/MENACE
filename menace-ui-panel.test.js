@@ -169,9 +169,9 @@ describe('menace-ui-panel.js', () => {
       const root = document.getElementById("menace_panels_root")
       expect(root.innerHTML).toContain("menace-combined-box")
       expect(root.innerHTML).toContain("MENACE")
-      expect(root.innerHTML).toContain("MENACE2")
+      expect(root.innerHTML).toContain("MENACE X")
       expect(root.innerHTML).toContain("popout-column")
-      expect(root.innerHTML).toContain("Pop out MENACE")
+      expect(root.innerHTML).toContain("Pop out MENACE O")
     })
   })
 

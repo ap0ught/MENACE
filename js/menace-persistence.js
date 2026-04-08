@@ -1,6 +1,7 @@
 /*************************************/
 /* MENACE — localStorage persistence */
 /*************************************/
+/* Payload keys m1 / m2 match menace[1] / menace[2] (MENACE O / MENACE X). plotdata_menace2 is the X-side cumulative series (engine 2). */
 
 var MENACE_STORAGE_KEY = "menace_app_state_v1"
 

@@ -1,6 +1,8 @@
 table.moves tr,
 table.moves {
   border: 0;
+  border-collapse: separate;
+  border-spacing: 6px;
 }
 
 td.board {
@@ -10,6 +12,7 @@ td.board {
   height: 35px;
   text-align: center;
   vertical-align: middle;
+  padding: 3px;
 }
 
 td.num {
@@ -143,9 +146,16 @@ table.board td.p4 {
   border: 2px solid grey;
   position: absolute;
   width: 120px;
-  height: 60px;
+  min-height: 76px;
+  height: auto;
+  padding: 8px 6px 10px 6px;
+  box-sizing: border-box;
   top: 200px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .summary {
@@ -153,7 +163,7 @@ table.board td.p4 {
   position: absolute;
   width: 440px;
   height: 100px;
-  top: 300px;
+  top: 312px;
   left: 35px;
   text-align: center;
   overflow: hidden;
@@ -162,7 +172,7 @@ table.board td.p4 {
 
 .graph-section {
   position: absolute;
-  top: 418px;
+  top: 430px;
   left: 35px;
 }
 
@@ -259,7 +269,7 @@ table.board td button {
 
 .speed {
   position: absolute;
-  top: 90px;
+  top: 175px;
   left: 280px;
   text-align: left;
 }
@@ -273,10 +283,21 @@ table.board td button {
 
 .human-move {
   position: absolute;
-  top: 120px;
+  top: 248px;
   left: 280px;
   text-align: left;
   max-width: 200px;
+}
+
+.player-learner-tag {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #444;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .human-move input[type="text"] {
@@ -456,7 +477,8 @@ table.board td button {
 
 .menace-moves-wrap {
   overflow-x: auto;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.65rem;
+  padding: 2px 0;
 }
 
 .menace-moves-wrap table.moves {
