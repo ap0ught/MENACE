@@ -16,12 +16,15 @@ on:
 jobs:
   qodana:
     runs-on: ubuntu-latest
+    # Run composite JS actions on Node 24 until they declare node24 (e.g. qodana-action still uses node20).
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: write
       pull-requests: write
       checks: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: 'Qodana Scan'
