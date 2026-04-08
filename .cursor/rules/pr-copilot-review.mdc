@@ -1,0 +1,24 @@
+---
+description: After pushing updates to a GitHub PR branch, request a Copilot review on that PR.
+alwaysApply: false
+# Scoped to PR/CI and project rules so this does not load in unrelated sessions.
+# When work is explicitly PR/push-related from other paths, still follow the steps below.
+globs:
+  - "**/.github/**"
+  - "**/.cursor/rules/**"
+---
+
+# PR updates: request Copilot review
+
+Whenever you push commits to a branch that has an open pull request (or right after creating/updating a PR), **ask GitHub Copilot to review** by posting a PR comment that mentions Copilot.
+
+1. Resolve the PR for the current branch: `gh pr view --json number,url` (or `gh pr status`).
+2. Post a short comment, for example:
+
+```bash
+gh pr comment --body "@copilot please review the latest changes on this PR."
+```
+
+Use a natural one-line ask; adjust if the change set has a specific focus (e.g. CI, security, tests).
+
+Do this **after each substantive push** that updates the PR, not after every tiny local commit unless the user asks for a review each time.
