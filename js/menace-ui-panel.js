@@ -205,7 +205,7 @@ function openMenaceColumnPopup(engineNum){
     var wname = engineNum === 1 ? "menaceMatchboxes1" : "menaceMatchboxes2"
     var w = window.open("", wname, "width=620,height=720,scrollbars=yes,resizable=yes")
     if(!w){ return }
-    var inner = "<div class='menace-combined-box menace-column-popout'><div class='menace-two-columns menace-single-column-popout'>" + buildMenaceColumnHTML(engineNum) + "</div></div>"
+    var inner = "<div class='menace-combined-box'><div class='menace-two-columns menace-single-column-popout'>" + buildMenaceColumnHTML(engineNum) + "</div></div>"
     w.document.open()
     w.document.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>"+title+"</title>")
     w.document.write("<link rel=\"stylesheet\" href=\""+cssUrl+"\">")
