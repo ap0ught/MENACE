@@ -58,13 +58,25 @@ function menaceIsArrayOfArrays(value){
     return true
 }
 
+function menaceNoBeadsValueOk(v){
+    return v === "pause" || v === "reset"
+}
+
 function menaceIsValidLoadedPlayerState(state){
-    return menaceIsObject(state) &&
+    if(!(
+        menaceIsObject(state) &&
         menaceIsObject(state.boxes) &&
         menaceIsArrayOfArrays(state.orderedBoxes) &&
         Array.isArray(state.start) &&
         typeof state.removesymm === "boolean" &&
         Array.isArray(state.incentives)
+    )){
+        return false
+    }
+    if(state.noBeads !== undefined && !menaceNoBeadsValueOk(state.noBeads)){
+        return false
+    }
+    return true
 }
 
 var _menaceSaveTimer = null
@@ -83,14 +95,16 @@ function menaceSaveStateToStorage(){
                 orderedBoxes: menace[1].orderedBoxes,
                 start: menace[1].start.slice(),
                 removesymm: menace[1].removesymm,
-                incentives: menace[1].incentives.slice()
+                incentives: menace[1].incentives.slice(),
+                noBeads: menace[1].noBeads === "pause" ? "pause" : "reset"
             },
             m2: {
                 boxes: menace[2].boxes,
                 orderedBoxes: menace[2].orderedBoxes,
                 start: menace[2].start.slice(),
                 removesymm: menace[2].removesymm,
-                incentives: menace[2].incentives.slice()
+                incentives: menace[2].incentives.slice(),
+                noBeads: menace[2].noBeads === "pause" ? "pause" : "reset"
             },
             plotdata: plotdata.slice(),
             plotdata_menace2: plotdata_menace2.slice(),
@@ -124,11 +138,13 @@ function menaceTryLoadFromStorage(){
         menace[1].start = o.m1.start
         menace[1].removesymm = o.m1.removesymm
         menace[1].incentives = o.m1.incentives
+        menace[1].noBeads = menaceNoBeadsValueOk(o.m1.noBeads) ? o.m1.noBeads : "reset"
         menace[2].boxes = o.m2.boxes
         menace[2].orderedBoxes = o.m2.orderedBoxes
         menace[2].start = o.m2.start
         menace[2].removesymm = o.m2.removesymm
         menace[2].incentives = o.m2.incentives
+        menace[2].noBeads = menaceNoBeadsValueOk(o.m2.noBeads) ? o.m2.noBeads : "reset"
         plotdata = o.plotdata
         wins_each = o.wins_each
         if(o.v === 2 &&

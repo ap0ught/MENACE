@@ -62,6 +62,8 @@ function show_set(n, doc){
     setMenaceSliderValue("_"+n+"_ic_d", menace[n]["incentives"][0], 0, 20, d)
     setMenaceSliderValue("_"+n+"_ic_l", -menace[n]["incentives"][2], 0, 20, d)
     d.getElementById("_"+n+"_includeall").checked = menace[n]["removesymm"]
+    var nb = d.getElementById("_"+n+"_no_beads")
+    if(nb){ nb.value = menace[n]["noBeads"] === "pause" ? "pause" : "reset" }
     d.getElementById("_"+n+"_tweak_h").style.display = "block"
     d.getElementById("_"+n+"_tweak_s").style.display = "none"
 }
@@ -92,13 +94,16 @@ function resetMenaceSettingsFormToDefaults(n, doc){
     setMenaceSliderValue("_"+n+"_ic_l", 1, 0, 20, d)
     var cb = d.getElementById("_"+n+"_includeall")
     if(cb){ cb.checked = true }
+    var nb = d.getElementById("_"+n+"_no_beads")
+    if(nb){ nb.value = "reset" }
 }
 
 /* One engine column: title, settings toggle, sliders, matchbox grid. */
 function buildMenaceColumnHTML(n){
+    /* Engine 1 = noughts learner (O), engine 2 = crosses learner (X). */
     var menacename = n === 2 ? "MENACE X" : "MENACE O"
     var output = "<div class='menace-panel menace-panel-col' data-menace-col='"+n+"'>"
-    output += "<h3 class='menace-col-heading'>"+menacename+"</h3>"
+    output += "<h3 class='menace-col-heading' title='"+menacename+"'>"+menacename+"</h3>"
     output += "<div class='menace-bead-legend' aria-label='Move color legend (each color is a board cell)'>"
     output += "<div class='menace-bead-legend-grid'>"
     for(var i=0;i<9;i++){
@@ -127,6 +132,12 @@ function buildMenaceColumnHTML(n){
         output += menaceBeadSliderRow("im8", "8th move", s2[3])
     }
     output += "<label class='menace-checkbox-row'><input type='checkbox' id='_"+n+"_includeall'> Merge symmetric positions</label>"
+    output += "<div class='menace_settings_title'>No beads in a matchbox</div>"
+    output += "<div class='menace-no-beads-row'><label class='menace-no-beads-label' for='_"+n+"_no_beads'>If none left</label> "
+    output += "<select id='_"+n+"_no_beads' class='menace-no-beads-select' aria-label='When a matchbox has no beads'>"
+    output += "<option value='reset'>Reset to starting beads</option>"
+    output += "<option value='pause'>Pause automation</option>"
+    output += "</select></div>"
     output += "<div class='menace_settings_title'>Bead rewards (per game)</div>"
     var ic = menace[n]["incentives"]
     output += menaceIncentiveSliderRow(n, "w", "Win", ic[1], 0, 20)

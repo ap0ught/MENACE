@@ -94,6 +94,17 @@ describe('menace-ui-panel.js', () => {
       expect(html).toContain("<span class='bead bead-0'")
       expect(html).toContain("<span class='bead-count'>0</span>")
     })
+
+    it('renders X for piece 2', () => {
+      const html = global.make_ox("020000000", 1)
+      expect(html).toContain('>X</td>')
+    })
+
+    it('renders multiple occupied cells', () => {
+      const html = global.make_ox("121000000", 1)
+      expect(html).toContain('>O</td>')
+      expect(html).toContain('>X</td>')
+    })
   })
 
   describe('setMenaceSliderValue', () => {
@@ -117,6 +128,12 @@ describe('menace-ui-panel.js', () => {
       
       global.setMenaceSliderValue("test-slider", 0, 1, 20)
       expect(document.getElementById("test-slider").value).toBe("1")
+    })
+
+    it('does nothing when slider id is missing', () => {
+      document.body.innerHTML = '<span id="x">ok</span>'
+      expect(() => global.setMenaceSliderValue("nonexistent-slider", 5, 1, 20)).not.toThrow()
+      expect(document.getElementById("x").textContent).toBe("ok")
     })
 
     it('updates unit text correctly', () => {
@@ -151,6 +168,40 @@ describe('menace-ui-panel.js', () => {
       expect(document.getElementById("_1_ic_w").value).toBe("3")
       expect(document.getElementById("_1_tweak_h").style.display).toBe("block")
     })
+
+    it('populates settings for engine 2', () => {
+      document.body.innerHTML = `
+        <input id="im2"><span id="im2_display"></span>
+        <input id="im4"><span id="im4_display"></span>
+        <input id="im6"><span id="im6_display"></span>
+        <input id="im8"><span id="im8_display"></span>
+        <input id="_2_ic_w"><span id="_2_ic_w_display"></span>
+        <input id="_2_ic_d"><span id="_2_ic_d_display"></span>
+        <input id="_2_ic_l"><span id="_2_ic_l_display"></span>
+        <input type="checkbox" id="_2_includeall">
+        <div id="_2_tweak_h" style="display: none"></div>
+        <div id="_2_tweak_s" style="display: block"></div>
+      `
+      global.menace[2].start = [5, 4, 3, 2]
+      global.menace[2].incentives = [2, 4, -2]
+      global.show_set(2)
+      expect(document.getElementById("im2").value).toBe("5")
+      expect(document.getElementById("im8").value).toBe("2")
+      expect(document.getElementById("_2_ic_w").value).toBe("4")
+      expect(document.getElementById("_2_tweak_h").style.display).toBe("block")
+    })
+  })
+
+  describe('hide_set', () => {
+    it('toggles tweak visibility', () => {
+      document.body.innerHTML = `
+        <div id="_1_tweak_h" style="display: block"></div>
+        <div id="_1_tweak_s" style="display: none"></div>
+      `
+      global.hide_set(1)
+      expect(document.getElementById("_1_tweak_h").style.display).toBe("none")
+      expect(document.getElementById("_1_tweak_s").style.display).toBe("block")
+    })
   })
 
   describe('buildMenaceColumnHTML', () => {
@@ -160,6 +211,13 @@ describe('menace-ui-panel.js', () => {
       expect(html).toContain("data-menace-col='1'")
       expect(html).toContain("1st move")
       expect(html).toContain("matchboxes total")
+    })
+
+    it('uses MENACE X heading for engine 2', () => {
+      const html = global.buildMenaceColumnHTML(2)
+      expect(html).toContain("MENACE X")
+      expect(html).toContain("2nd move")
+      expect(html).toContain("data-menace-col='2'")
     })
   })
 
@@ -195,6 +253,28 @@ describe('menace-ui-panel.js', () => {
       global.syncMenaceSettingSliderDisplay(slider)
       expect(document.getElementById("slider2_unit").textContent).toBe("bead")
     })
+
+    it('no-ops for non-range or wrong class', () => {
+      document.body.innerHTML = `
+        <input type="text" id="bad" class="menace-settings-slider" value="x">
+        <input type="range" id="norclass" value="3">
+      `
+      global.syncMenaceSettingSliderDisplay(document.getElementById("bad"))
+      global.syncMenaceSettingSliderDisplay(document.getElementById("norclass"))
+      expect(document.getElementById("bad").value).toBe("x")
+    })
+
+    it('accepts optional doc for popout document', () => {
+      const popup = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: 'http://localhost/pop' })
+      const d = popup.window.document
+      d.body.innerHTML = `
+        <input type="range" id="pop_slider" class="menace-settings-slider" value="7">
+        <span id="pop_slider_display">0</span>
+      `
+      const slider = d.getElementById("pop_slider")
+      global.syncMenaceSettingSliderDisplay(slider, d)
+      expect(d.getElementById("pop_slider_display").textContent).toBe("7")
+    })
   })
 
   describe('menaceBeadSliderRow', () => {
@@ -203,6 +283,13 @@ describe('menace-ui-panel.js', () => {
       expect(html).toContain("1st move")
       expect(html).toContain("id='im1'")
       expect(html).toContain("value='8'")
+    })
+
+    it('clamps value to 1..20 in generated HTML', () => {
+      const low = global.menaceBeadSliderRow("imX", "test", -5)
+      expect(low).toContain("value='1'")
+      const high = global.menaceBeadSliderRow("imY", "test", 99)
+      expect(high).toContain("value='20'")
     })
   })
 
@@ -219,6 +306,13 @@ describe('menace-ui-panel.js', () => {
       expect(html).toContain("Lose")
       expect(html).toContain("take <span id='_1_ic_l_display'>1</span>")
     })
+
+    it('generates correct HTML for draws', () => {
+      const html = global.menaceIncentiveSliderRow(2, "d", "Draw", 5, 0, 20)
+      expect(html).toContain("Draw")
+      expect(html).toContain("id='_2_ic_d'")
+      expect(html).toContain("+<span id='_2_ic_d_display'>5</span>")
+    })
   })
 
   describe('update_box', () => {
@@ -227,6 +321,12 @@ describe('menace-ui-panel.js', () => {
       global.update_box("000000000", 1)
       expect(document.getElementById('m1_board_000000000').innerHTML).toContain("table")
       expect(document.getElementById('m1_board_000000000').innerHTML).toContain("board")
+    })
+
+    it('does nothing when wrapper is missing', () => {
+      document.body.innerHTML = "<div id='other'>x</div>"
+      expect(() => global.update_box("000000000", 1)).not.toThrow()
+      expect(document.getElementById("other").textContent).toBe("x")
     })
   })
 })
