@@ -154,8 +154,12 @@ function drawLegend(c, ctx, items){
     }
 }
 
-function roleModeLabel(m){
-    return (m === "h") ? "Human" : (m === "r") ? "Random" : (m === "m") ? "MENACE" : (m === "p") ? "Perfect" : String(m)
+function roleModeLabel(m, side){
+    if(m === "h"){ return "Human" }
+    if(m === "r"){ return "Random" }
+    if(m === "m"){ return side === 1 ? "MENACE O" : "MENACE X" }
+    if(m === "p"){ return "Perfect" }
+    return String(m)
 }
 
 function roleEventColor(mode, side){
@@ -187,7 +191,7 @@ function drawRoleEvents(c, ctx, mode){
         ctx.globalAlpha = 1
         ctx.fillStyle = color
         var y = baseY + (i % 3) * 12
-        var label = (ev.side === 1 ? "O: " : "X: ") + roleModeLabel(ev.mode)
+        var label = (ev.side === 1 ? "O: " : "X: ") + roleModeLabel(ev.mode, ev.side)
         ctx.fillText(label, x + 4, y)
     }
     ctx.restore()
@@ -255,8 +259,8 @@ function redraw_plot(){
         strokeSeries(c, ctx, plotdata, "#2563eb")
         strokeSeries(c, ctx, plotdata_menace2, "#dc2626")
         drawLegend(c, ctx, [
-            { color: "#2563eb", label: "MENACE (O)" },
-            { color: "#dc2626", label: "X learner (MENACE2 or Human)" }
+            { color: "#2563eb", label: "MENACE O" },
+            { color: "#dc2626", label: "MENACE X (or Human when teaching)" }
         ])
     } else if(mode === "wins"){
         strokeSeries(c, ctx, plot_cum_draw, "#64748b")

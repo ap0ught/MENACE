@@ -274,6 +274,14 @@ function play_x_side(){
     }
 }
 
+function displayNameForPlayerMode(side){
+    var mode = side === 1 ? player_o : player_x
+    if(mode === "m"){
+        return side === 1 ? "MENACE O" : "MENACE X"
+    }
+    return whoA[mode]
+}
+
 function check_win(){
     var who_wins = winner(board)
     if(who_wins !== false){
@@ -281,10 +289,10 @@ function check_win(){
             say("It's a draw.")
         }
         if(who_wins === 1){
-            say(whoA[player_o] + " wins (O).")
+            say(displayNameForPlayerMode(1) + " wins (O).")
         }
         if(who_wins === 2){
-            say(whoA[player_x] + " wins (X).")
+            say(displayNameForPlayerMode(2) + " wins (X).")
         }
         do_win(who_wins)
         human_turn = false

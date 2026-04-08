@@ -22,7 +22,7 @@
   <label for="human_cell_input">Your move (1–9): top row 7–9, bottom row 1–3. A valid digit applies immediately.</label><br />
   <input type="text" id="human_cell_input" maxlength="1" inputmode="numeric" pattern="[1-9]" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Cell number 1 to 9 for your move" />
 </div>
-<div class="moves-container" id="menace_panels_root" aria-label="MENACE and MENACE2 matchbox panels"></div>
+<div class="moves-container" id="menace_panels_root" aria-label="MENACE O and MENACE X matchbox panels"></div>
 <table class="board large">
 <tr>
     <td id="pos0" class="p0" data-cell-n="7"></td>
@@ -40,19 +40,21 @@
     <td id="pos8" class="p8" data-cell-n="3"></td>
 </tr>
 </table>
-<div class="players"><label class="player-label">O:<br /><select id="p1picker" aria-label="Player O (first move)">
+<div class="players"><label class="player-label">O:<br /><select id="p1picker" aria-label="Player O (first move); MENACE uses the MENACE O learner (left panel)">
 <option value="h">Human</option>
 <option value="r">Random</option>
 <option value="m">MENACE</option>
 <option value="p">Perfect</option>
 </select>
+<span class="player-learner-tag" title="If you pick MENACE here, moves train the learner saved as MENACE O (left column).">MENACE O</span>
 <p class="player-help" id="p1_help" hidden></p></label>
-<label class="player-label">X:<br /><select id="p2picker" aria-label="Player X (second move)">
+<label class="player-label">X:<br /><select id="p2picker" aria-label="Player X (second move); MENACE uses the MENACE X learner (right panel)">
 <option value="h">Human</option>
 <option value="r">Random</option>
 <option value="m">MENACE</option>
 <option value="p">Perfect</option>
 </select>
+<span class="player-learner-tag" title="If you pick MENACE here, moves train the learner saved as MENACE X (right column).">MENACE X</span>
 <p class="player-help" id="p2_help" hidden></p></label></div>
 <div class="wins" id="n1"><small>O wins</small><div class="dis" id="dis1">0</div></div>
 <div class="wins" id="n2"><small>Draws</small><div class="dis" id="dis0">0</div></div>

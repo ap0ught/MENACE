@@ -14,11 +14,11 @@ This program uses the same idea with **virtual matchboxes**: each position store
 
 ## What you get
 
-- **MENACE (O)** plays first and learns from experience.
+- **MENACE O** (noughts, first move) can learn from experience.
 - **Player X** can be:
   - **Human** — you click the board.
   - **Random** — uniform random legal moves.
-  - **MENACE2** — a second independent learner (both sides learn).
+  - **MENACE X** — a second independent learner (both sides learn).
   - **Perfect** — minimax optimal play (unbeatable).
 - **Symmetry** — equivalent board rotations are normalized so the same “box” covers symmetric positions (optional setting per engine).
 - **Stats** — win / draw / loss counts and a **canvas graph** of how bead totals in the first box evolve over games (a simple learning curve).
@@ -42,9 +42,9 @@ Then visit `http://localhost:8080` (or the URL your tool prints).
 
 ## Usage notes
 
-- **MENACE** is always **noughts (O)**; the opponent is **crosses (X)**.
+- The **MENACE O** engine always plays **noughts (O)**; **MENACE X** plays **crosses (X)** when that side is set to learn.
 - For non-human opponents, use the **speed** slider to slow down or speed up automated games.
-- Expand **Show MENACE’s settings** (and MENACE2’s when enabled) to change initial bead counts per move number, win/draw/loss incentives, symmetry handling, and to reset learning.
+- Expand **Settings** under each column (**MENACE O** | **MENACE X**) to change initial bead counts per move number, win/draw/loss incentives, symmetry handling, and to reset learning.
 
 ## Project layout
 

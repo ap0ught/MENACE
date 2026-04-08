@@ -1,6 +1,6 @@
 /*************************************/
 /* MENACE — matchbox grid & settings */
-/* Single combined panel: MENACE | MENACE2 */
+/* Single combined panel: MENACE O | MENACE X */
 /*************************************/
 
 /* Mini-board cell ids are prefixed by engine n so both columns can coexist. */
@@ -96,7 +96,7 @@ function resetMenaceSettingsFormToDefaults(n, doc){
 
 /* One engine column: title, settings toggle, sliders, matchbox grid. */
 function buildMenaceColumnHTML(n){
-    var menacename = n === 2 ? "MENACE2" : "MENACE"
+    var menacename = n === 2 ? "MENACE X" : "MENACE O"
     var output = "<div class='menace-panel menace-panel-col' data-menace-col='"+n+"'>"
     output += "<h3 class='menace-col-heading'>"+menacename+"</h3>"
     output += "<div class='menace-bead-legend' aria-label='Move color legend (each color is a board cell)'>"
@@ -180,8 +180,8 @@ function showMenacePanels(){
     if(!root){ return }
     var html = "<div class='menace-combined-box'>"
     html += "<div class='menace-combined-toolbar menace-combined-toolbar-popouts'>"
-    html += "<button type='button' data-menace-action='popout-column' data-menace-id='1' class='menace-popout-btn'>Pop out MENACE</button>"
-    html += "<button type='button' data-menace-action='popout-column' data-menace-id='2' class='menace-popout-btn'>Pop out MENACE2</button>"
+    html += "<button type='button' data-menace-action='popout-column' data-menace-id='1' class='menace-popout-btn'>Pop out MENACE O</button>"
+    html += "<button type='button' data-menace-action='popout-column' data-menace-id='2' class='menace-popout-btn'>Pop out MENACE X</button>"
     html += "</div>"
     html += "<div class='menace-two-columns'>"
     html += buildMenaceColumnHTML(1)
@@ -201,7 +201,7 @@ function hide_menace(n){
 function openMenaceColumnPopup(engineNum){
     if(engineNum !== 1 && engineNum !== 2){ return }
     var cssUrl = new URL("styles.css", window.location.href).href
-    var title = engineNum === 1 ? "MENACE matchboxes" : "MENACE2 matchboxes"
+    var title = engineNum === 1 ? "MENACE O matchboxes" : "MENACE X matchboxes"
     var wname = engineNum === 1 ? "menaceMatchboxes1" : "menaceMatchboxes2"
     var w = window.open("", wname, "width=620,height=720,scrollbars=yes,resizable=yes")
     if(!w){ return }

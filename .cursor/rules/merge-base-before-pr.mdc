@@ -1,9 +1,6 @@
 ---
 description: Merge the repository default branch into the feature branch before opening a PR.
-alwaysApply: false
-globs:
-  - "**/.github/**"
-  - "**/.cursor/rules/**"
+alwaysApply: true
 ---
 
 # Merge base branch before creating a PR
@@ -18,7 +15,7 @@ Before **creating** or **finalizing** a pull request from a feature branch, sync
 git merge origin/<default>
 ```
 
-Resolve any conflicts, run tests if applicable, then push.
+Resolve any merge conflicts (prefer keeping the feature branch’s intended behavior; integrate upstream changes deliberately), run tests if applicable, commit the merge or rebase result, then push. **Do not push or finalize a PR while the branch is still conflicted or behind the default branch in a way that would show merge conflicts on GitHub.**
 
 **Do not** open a PR from a branch that has not incorporated the latest default branch unless the user explicitly asks to skip (e.g. hotfix workflow).
 
