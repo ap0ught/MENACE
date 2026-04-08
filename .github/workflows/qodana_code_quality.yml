@@ -26,8 +26,10 @@ jobs:
           fetch-depth: 0
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.3.2
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        # Community linter in qodana.yaml does not require QODANA_TOKEN.
+        # To also forward reports to Qodana Cloud, add repo secret QODANA_TOKEN and uncomment:
+        # env:
+        #   QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
           # When pr-mode is set to true, Qodana analyzes only the files that have been changed
           pr-mode: false
