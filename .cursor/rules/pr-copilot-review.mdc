@@ -1,6 +1,11 @@
 ---
 description: After pushing updates to a GitHub PR branch, request a Copilot review on that PR.
-alwaysApply: true
+alwaysApply: false
+# Scoped to PR/CI and project rules so this does not load in unrelated sessions.
+# When work is explicitly PR/push-related from other paths, still follow the steps below.
+globs:
+  - "**/.github/**"
+  - "**/.cursor/rules/**"
 ---
 
 # PR updates: request Copilot review
