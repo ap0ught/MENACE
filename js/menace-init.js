@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     player_o = "m"
     player_x = "h"
     document.getElementById("speed_slider").value = "1000"
+    updateSpeedDisplay()
     var p1 = document.getElementById("p1picker")
     var p2 = document.getElementById("p2picker")
     if(p1){
@@ -19,7 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     var ss = document.getElementById("speed_slider")
     if(ss){
-        ss.addEventListener("input", resumeFromPauseIfNeeded)
+        ss.addEventListener("input", function () {
+            updateSpeedDisplay()
+            resumeFromPauseIfNeeded()
+        })
     }
     updateSpeedVisibility()
     updatePlayerModeHelp()

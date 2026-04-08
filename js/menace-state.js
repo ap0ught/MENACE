@@ -66,3 +66,5 @@ var said = ["","","","","","","","","",""]
 var human_turn = false
 /* Typed cell 1..9 (7-9 top row, 1-3 bottom) → board index 0..8. */
 var BOARD_IDX_FOR_CELL_NUM = [6,7,8,3,4,5,0,1,2]
+/* board index 0..8 (left-to-right, top-to-bottom) → cell number 1..9 for messages. */
+var CELL_NUM_FOR_BOARD_IDX = [7,8,9,4,5,6,1,2,3]

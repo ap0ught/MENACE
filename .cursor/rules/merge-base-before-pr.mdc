@@ -1,0 +1,24 @@
+---
+description: Merge the default branch (e.g. master) into the feature branch before opening a PR.
+alwaysApply: false
+globs:
+  - "**/.github/**"
+  - "**/.cursor/rules/**"
+---
+
+# Merge base branch before creating a PR
+
+Before **creating** or **finalizing** a pull request from a feature branch, sync with the repository default branch (this project: **`master`**; use `main` if that is the default).
+
+1. Fetch latest: `git fetch origin`
+2. Merge the base into your branch (from the feature branch):
+
+```bash
+git merge origin/master
+```
+
+Resolve any conflicts, run tests if applicable, then push.
+
+**Do not** open a PR from a branch that has not incorporated the latest `master` unless the user explicitly asks to skip (e.g. hotfix workflow).
+
+If the team prefers rebase instead of merge, use `git rebase origin/master` after fetch, then force-push only when the user approves.

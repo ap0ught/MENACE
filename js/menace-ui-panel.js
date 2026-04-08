@@ -179,8 +179,9 @@ function showMenacePanels(){
     var root = document.getElementById("menace_panels_root")
     if(!root){ return }
     var html = "<div class='menace-combined-box'>"
-    html += "<div class='menace-combined-toolbar'>"
-    html += "<button type='button' data-menace-action='popout-panels' class='menace-popout-btn'>Pop out</button>"
+    html += "<div class='menace-combined-toolbar menace-combined-toolbar-popouts'>"
+    html += "<button type='button' data-menace-action='popout-column' data-menace-id='1' class='menace-popout-btn'>Pop out MENACE</button>"
+    html += "<button type='button' data-menace-action='popout-column' data-menace-id='2' class='menace-popout-btn'>Pop out MENACE2</button>"
     html += "</div>"
     html += "<div class='menace-two-columns'>"
     html += buildMenaceColumnHTML(1)
@@ -197,18 +198,20 @@ function hide_menace(n){
     }
 }
 
-function openMenacePanelsPopup(){
-    var host = document.getElementById("menace_panels_root")
-    if(!host){ return }
+function openMenaceColumnPopup(engineNum){
+    if(engineNum !== 1 && engineNum !== 2){ return }
     var cssUrl = new URL("styles.css", window.location.href).href
-    var w = window.open("", "menaceMatchboxes", "width=1100,height=720,scrollbars=yes,resizable=yes")
+    var title = engineNum === 1 ? "MENACE matchboxes" : "MENACE2 matchboxes"
+    var wname = engineNum === 1 ? "menaceMatchboxes1" : "menaceMatchboxes2"
+    var w = window.open("", wname, "width=620,height=720,scrollbars=yes,resizable=yes")
     if(!w){ return }
+    var inner = "<div class='menace-combined-box menace-column-popout'><div class='menace-two-columns menace-single-column-popout'>" + buildMenaceColumnHTML(engineNum) + "</div></div>"
     w.document.open()
-    w.document.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>MENACE matchboxes</title>")
+    w.document.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>"+title+"</title>")
     w.document.write("<link rel=\"stylesheet\" href=\""+cssUrl+"\">")
     w.document.write("</head><body class=\"menace-popup-body\">")
-    w.document.write(host.innerHTML)
-    w.document.write("<p class=\"menace-popup-note\"><em>Play in the main window.</em> Settings work here too. After &ldquo;Save &amp; reset&rdquo;, pop out again to refresh the matchbox grid in this window.</p>")
+    w.document.write(inner)
+    w.document.write("<p class=\"menace-popup-note\"><em>Play in the main window.</em> Settings work here. After &ldquo;Save &amp; reset&rdquo;, open this pop-out again to refresh the grid.</p>")
     w.document.write("</body></html>")
     w.document.close()
     menaceWirePopupPanelDocument(w)
@@ -227,7 +230,7 @@ function menaceWirePopupPanelDocument(w){
         "var el=e.target.closest(\"[data-menace-action]\");",
         "if(!el)return;",
         "var action=el.getAttribute(\"data-menace-action\");",
-        "if(action===\"popout-panels\")return;",
+        "if(action===\"popout-column\")return;",
         "var id=parseInt(el.getAttribute(\"data-menace-id\"),10);",
         "if(id!==1&&id!==2)return;",
         "if(action===\"show-settings\")O.show_set(id,D);",
@@ -291,11 +294,11 @@ function onMenaceDelegatedClick(e) {
     var el = e.target.closest("[data-menace-action]")
     if (!el) return
     var action = el.getAttribute("data-menace-action")
-    if (action === "popout-panels") {
-        openMenacePanelsPopup()
+    var id = parseInt(el.getAttribute("data-menace-id"), 10)
+    if (action === "popout-column") {
+        openMenaceColumnPopup(id)
         return
     }
-    var id = parseInt(el.getAttribute("data-menace-id"), 10)
     if (id !== 1 && id !== 2) return
     if (action === "show-settings") show_set(id)
     else if (action === "hide-settings") hide_set(id)
