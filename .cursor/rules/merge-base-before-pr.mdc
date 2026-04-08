@@ -1,9 +1,6 @@
 ---
 description: Merge the repository default branch into the feature branch before opening a PR.
-alwaysApply: false
-globs:
-  - "**/.github/**"
-  - "**/.cursor/rules/**"
+alwaysApply: true
 ---
 
 # Merge base branch before creating a PR
