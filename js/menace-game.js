@@ -1,14 +1,96 @@
 /*************************************/
 /* MENACE — play loop & main board   */
-/* Turn order: MENACE (1) then X.    */
+/* O moves first; each side has its  */
+/* own opponent type.               */
 /*************************************/
 
-/* Empty cell on main grid; adds a click button in human mode, CSS watermark label only otherwise. */
+function nextPlayerIsO(){
+    return count(board, 0) % 2 === 1
+}
+
+function hasAnyHuman(){
+    return player_o === "h" || player_x === "h"
+}
+
+function hasAnyAi(){
+    return player_o !== "h" || player_x !== "h"
+}
+
+function isPaused(){
+    var el = document.getElementById("speed_slider")
+    if(!el){ return false }
+    var v = parseInt(el.value, 10)
+    return isNaN(v) || v <= 0
+}
+
+/* null = paused (left); else delay in ms (right = faster). */
+function getAutomationDelayMs(){
+    if(isPaused()){ return null }
+    var v = parseInt(document.getElementById("speed_slider").value, 10)
+    return Math.max(10, 1000 - v)
+}
+
+function getInterMoveDelayMs(){
+    var d = getAutomationDelayMs()
+    if(d === null){ return null }
+    return Math.max(5, Math.floor(d / 10))
+}
+
+function scheduleAutomation(fn, delayMs){
+    if(automationTimeoutId !== null){
+        window.clearTimeout(automationTimeoutId)
+        automationTimeoutId = null
+    }
+    if(delayMs === null){
+        automationResumePending = fn
+        return
+    }
+    automationResumePending = null
+    automationTimeoutId = window.setTimeout(function () {
+        automationTimeoutId = null
+        if(isPaused()){
+            automationResumePending = fn
+            return
+        }
+        automationResumePending = null
+        fn()
+    }, delayMs)
+}
+
+function resumeFromPauseIfNeeded(){
+    if(isPaused()){
+        if(automationTimeoutId !== null){
+            window.clearTimeout(automationTimeoutId)
+            automationTimeoutId = null
+        }
+        return
+    }
+    if(!automationResumePending){ return }
+    var fn = automationResumePending
+    automationResumePending = null
+    fn()
+}
+
+function scheduleAfterGame(fn){
+    if(hasAnyHuman()){
+        window.setTimeout(fn, 1000)
+    } else {
+        scheduleAutomation(fn, getAutomationDelayMs())
+    }
+}
+
+function updateSpeedVisibility(){
+    var sd = document.getElementById("speeddiv")
+    if(!sd){ return }
+    sd.style.display = hasAnyAi() ? "block" : "none"
+}
+
+/* Empty cell on main grid; click buttons when either side can be human. */
 function mainBoardCellClear(i){
     var td = document.getElementById("pos"+i)
     td.textContent = ""
     td.classList.remove("has-mark")
-    if(player == "h"){
+    if(player_o === "h" || player_x === "h"){
         var btn = document.createElement("button")
         btn.type = "button"
         btn.setAttribute("aria-label", "Play cell " + td.getAttribute("data-cell-n"))
@@ -36,47 +118,164 @@ function new_game(){
         for(var i=0;i<9;i++){
             mainBoardCellClear(i)
         }
-        play_menace()
+        continueGame()
     }
 }
 
-function setPlayer(setTo){
-    player = setTo
-    document.getElementById("who").textContent = whoA[setTo]
-    if(setTo!="h"){
-        document.getElementById("speeddiv").style.display = "block"
-    } else {
-        document.getElementById("speeddiv").style.display = "none"
+function updatePlayerModeHelp(){
+    var h1 = document.getElementById("p1_help")
+    var h2 = document.getElementById("p2_help")
+    var p1 = document.getElementById("p1picker")
+    var p2 = document.getElementById("p2picker")
+    if(h1 && p1){
+        if(p1.value === "p"){
+            h1.hidden = false
+            h1.textContent = "Perfect: minimax (optimal play). With best play on both sides, tic-tac-toe is usually a draw; O cannot force a win against a perfect opponent."
+        } else {
+            h1.hidden = true
+            h1.textContent = ""
+        }
     }
+    if(h2 && p2){
+        if(p2.value === "p"){
+            h2.hidden = false
+            h2.textContent = "Perfect: minimax (optimal play). Second player can always force at least a draw against any opponent."
+        } else {
+            h2.hidden = true
+            h2.textContent = ""
+        }
+    }
+}
+
+function syncPlayersFromPickers(){
+    var p1 = document.getElementById("p1picker")
+    var p2 = document.getElementById("p2picker")
+    var oldO = player_o
+    var oldX = player_x
+    if(p1){ player_o = p1.value }
+    if(p2){ player_x = p2.value }
+    /* Log role-change annotations at the current game index. */
+    if(player_o !== oldO){
+        role_events.push({ x: plotdata.length - 1, side: 1, mode: player_o })
+        menaceScheduleSave()
+    }
+    if(player_x !== oldX){
+        role_events.push({ x: plotdata.length - 1, side: 2, mode: player_x })
+        menaceScheduleSave()
+    }
+    updatePlayerModeHelp()
+    updateSpeedVisibility()
     updateHumanMoveControls()
-    /* If user switches away from human mid-turn, let the automaton move. */
-    if(setTo!="h" && human_turn){
-        play_opponent()
+    if(!human_turn){ return }
+    if(nextPlayerIsO()){
+        if(player_o !== "h"){
+            human_turn = false
+            continueGame()
+        }
+    } else {
+        if(player_x !== "h"){
+            human_turn = false
+            continueGame()
+        }
+    }
+}
+
+function continueGame(){
+    if(!playagain || !no_winner){ return }
+    if(nextPlayerIsO()){
+        play_o_side()
+    } else {
+        play_x_side()
+    }
+}
+
+function play_o_side(){
+    if(player_o === "h"){
+        human_turn = true
+        updateHumanMoveControls()
+        return
+    }
+    human_turn = false
+    var where
+    if(player_o === "r"){
+        where = get_random_move()
+    } else if(player_o === "m"){
+        where = get_menace_move(1)
+    } else if(player_o === "p"){
+        where = get_perfect_move_for_side(1)
+    } else {
+        return
+    }
+    if(where === "resign"){
+        if(count(board, 0) === 9){
+            say("O cannot open — no beads in the first box.")
+            playagain = false
+            return
+        }
+        do_win(2)
+        say("O resigns.")
+        return
+    }
+    board[where] = 1
+    mainBoardCellPlacePiece(where, 1)
+    check_win()
+    if(no_winner){
+        scheduleAutomation(continueGame, getInterMoveDelayMs())
+    }
+}
+
+function play_x_side(){
+    if(player_x === "h"){
+        human_turn = true
+        updateHumanMoveControls()
+        return
+    }
+    human_turn = false
+    var where
+    if(player_x === "r"){
+        where = get_random_move()
+    } else if(player_x === "m"){
+        where = get_menace_move(2)
+    } else if(player_x === "p"){
+        where = get_perfect_move_for_side(2)
+    } else {
+        return
+    }
+    if(where === "resign"){
+        do_win(1)
+        say("X resigns.")
+        return
+    }
+    board[where] = 2
+    mainBoardCellPlacePiece(where, 2)
+    check_win()
+    if(no_winner){
+        scheduleAutomation(continueGame, getInterMoveDelayMs())
     }
 }
 
 function check_win(){
     var who_wins = winner(board)
     if(who_wins !== false){
-        if(who_wins == 0){
+        if(who_wins === 0){
             say("It's a draw.")
         }
-        if(who_wins == 1){
-            say("MENACE wins.")
+        if(who_wins === 1){
+            say(whoA[player_o] + " wins (O).")
         }
-        if(who_wins == 2){
-            say(whoA[player]+" wins.")
+        if(who_wins === 2){
+            say(whoA[player_x] + " wins (X).")
         }
         do_win(who_wins)
         human_turn = false
     }
 }
 
-/* Clear unused cells visually, apply learning, schedule next game (delay from speed slider if AI). */
+/* Clear unused cells visually, apply learning, schedule next game. */
 function do_win(who_wins){
     no_winner = false
     for(var i=0;i<9;i++){
-        if(board[i] == 0){
+        if(board[i] === 0){
             var tde = document.getElementById("pos"+i)
             tde.textContent = ""
             tde.classList.remove("has-mark")
@@ -84,79 +283,47 @@ function do_win(who_wins){
     }
     menace_add_beads(who_wins)
     menaceScheduleSave()
-    if(player == "h"){
-        window.setTimeout(new_game, 1000)
-    } else {
-        var delay = Math.abs(parseInt(document.getElementById("speed_slider").value, 10))
-        window.setTimeout(new_game, delay)
-    }
-}
-
-function play_menace(){
-    var where = get_menace_move(1)
-    if(where=="resign"){
-        if(count(board,0)==9){
-            say("MENACE has run out of beads in the first box and refuses to play.")
-            playagain = false
-            return
-        }
-        do_win(2)
-        say("MENACE resigns")
-        return
-    }
-    board[where] = 1
-    mainBoardCellPlacePiece(where, 1)
-    check_win()
-    if(no_winner){
-        play_opponent()
-    }
-}
-
-function play_opponent(){
-    if(player == 'h'){
-        human_turn = true
-        updateHumanMoveControls()
-        return
-    }
-    human_turn = false
-    var where = undefined
-    if(player == 'r'){
-        where = get_random_move()
-    } else if(player == 'm'){
-        where = get_menace_move(2)
-    } else if(player == 'p'){
-        where = get_perfect_move()
-    }
-    if(where=="resign"){
-        do_win(1)
-        say("MENACE2 resigns")
-        return
-    }
-    board[where] = 2
-    mainBoardCellPlacePiece(where, 2)
-    check_win()
-    if(no_winner){
-        /* Slight delay so the human can follow automated play. */
-        var delay = Math.abs(parseInt(document.getElementById("speed_slider").value, 10))
-        window.setTimeout(play_menace, delay / 10)
-    }
+    scheduleAfterGame(new_game)
 }
 
 function play_human(where){
-    if(!no_winner || !human_turn || player !== "h"){
+    if(!no_winner || !human_turn){
         return
     }
     if(board[where] !== 0){
         return
     }
-    var boardBefore = board.slice()
-    recordMenace2HumanMove(boardBefore, where)
+    if(nextPlayerIsO()){
+        if(player_o !== "h"){
+            return
+        }
+        var boardBefore = board.slice()
+        if(player_o === "h" && (player_x === "m" || player_x === "h")){
+            recordHumanLearnerMove(1, boardBefore, where)
+        }
+        human_turn = false
+        board[where] = 1
+        mainBoardCellPlacePiece(where, 1)
+        check_win()
+        if(no_winner){
+            continueGame()
+        }
+        updateHumanMoveControls()
+        return
+    }
+    if(player_x !== "h"){
+        return
+    }
+    var boardBeforeO = board.slice()
+    if(player_x === "h" && (player_o === "m" || player_o === "h")){
+        recordHumanLearnerMove(2, boardBeforeO, where)
+    }
     human_turn = false
     board[where] = 2
     mainBoardCellPlacePiece(where, 2)
     check_win()
     if(no_winner){
-        play_menace()
+        continueGame()
     }
     updateHumanMoveControls()
 }
@@ -165,16 +332,19 @@ function updateHumanMoveControls(){
     var wrap = document.getElementById("human_move_wrap")
     var inp = document.getElementById("human_cell_input")
     if(!wrap || !inp){ return }
-    if(player !== "h"){
+    var needHuman = false
+    if(human_turn && no_winner){
+        if(nextPlayerIsO() && player_o === "h"){ needHuman = true }
+        if(!nextPlayerIsO() && player_x === "h"){ needHuman = true }
+    }
+    if(!needHuman){
         wrap.hidden = true
         inp.disabled = true
         return
     }
     wrap.hidden = false
-    inp.disabled = !human_turn || !no_winner
-    if(!inp.disabled){
-        inp.focus()
-    }
+    inp.disabled = false
+    inp.focus()
 }
 
 function submitHumanCellInput(){
@@ -190,7 +360,13 @@ function submitHumanCellInput(){
         inp.value = ""
         return
     }
-    if(!human_turn || player !== "h" || !no_winner){
+    if(!human_turn || !no_winner){
+        return
+    }
+    if(nextPlayerIsO() && player_o !== "h"){
+        return
+    }
+    if(!nextPlayerIsO() && player_x !== "h"){
         return
     }
     inp.value = ""

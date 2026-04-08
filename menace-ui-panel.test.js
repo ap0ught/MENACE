@@ -43,8 +43,9 @@ describe('menace-ui-panel.js', () => {
       }
     }
     global.pieces = ["", "O", "X"]
-    global.whoA = { "h": "Human", "r": "Random", "m": "MENACE2", "p": "Perfect" }
-    global.player = "h"
+    global.whoA = { "h": "Human", "r": "Random", "m": "MENACE", "p": "Perfect" }
+    global.player_o = "m"
+    global.player_x = "h"
 
     // Execute the script in the mocked global context
     const script = new window.Function(panelJs + "\n" + 
@@ -77,7 +78,8 @@ describe('menace-ui-panel.js', () => {
       const html = global.make_ox("000000000", 1)
       expect(html).toContain("<table class='board'>")
       expect(html).toContain("id='m1-000000000-0'")
-      expect(html).toContain("num'>1</td>") // bead count from menace[1].boxes["000000000"][0]
+      expect(html).toContain("<span class='bead bead-0'") // move-color bead marker
+      expect(html).toContain("<span class='bead-count'>1</span>") // bead count from menace[1].boxes["000000000"][0]
     })
 
     it('generates correct HTML with pieces', () => {
@@ -89,7 +91,8 @@ describe('menace-ui-panel.js', () => {
     it('handles missing box data safely', () => {
       // 000000000 with engine 2 which has no boxes
       const html = global.make_ox("000000000", 2)
-      expect(html).toContain("num'>0</td>")
+      expect(html).toContain("<span class='bead bead-0'")
+      expect(html).toContain("<span class='bead-count'>0</span>")
     })
   })
 

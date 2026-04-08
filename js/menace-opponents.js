@@ -13,9 +13,13 @@ function get_random_move(){
     return choices[Math.floor(Math.random()*choices.length)]
 }
 
-/* Unbeatable X: minimax as player 2 (maximizer). */
+/* Unbeatable play for the given side (1=O, 2=X). */
+function get_perfect_move_for_side(side){
+    return minimax(board, side).index
+}
+
 function get_perfect_move(){
-    return minimax(board,2).index
+    return get_perfect_move_for_side(2)
 }
 
 /* Classic negamax-style scores: X wants high, O low; terminal depth bonus for faster wins. */

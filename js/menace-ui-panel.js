@@ -12,7 +12,7 @@ function make_ox(pos,n){
         output += "<td id='"+pfx+pos+"-"+i+"' class='p"+i
         if(pos[i] == 0){
             var beads = (menace[n]["boxes"][pos] && menace[n]["boxes"][pos][i] !== undefined) ? menace[n]["boxes"][pos][i] : 0
-            output += " num'>"+beads+"</td>"
+            output += " num'><span class='bead bead-"+i+"' aria-hidden='true'></span><span class='bead-count'>"+beads+"</span></td>"
         } else {
             output += "'>"
             output += pieces[pos[i]]
@@ -30,42 +30,68 @@ function update_box(key,n){
 }
 
 /* Clamp and sync a range input plus its paired _display span (id + "_display"). */
-function setMenaceSliderValue(sliderId, value, min, max){
-    var el = document.getElementById(sliderId)
+/* doc: optional root document (e.g. popout window) — defaults to main document. */
+function setMenaceSliderValue(sliderId, value, min, max, doc){
+    var d = doc || document
+    var el = d.getElementById(sliderId)
     if(!el){ return }
     var v = Math.min(max, Math.max(min, value))
     el.value = String(v)
-    var disp = document.getElementById(sliderId + "_display")
+    var disp = d.getElementById(sliderId + "_display")
     if(disp){ disp.textContent = String(v) }
-    var unit = document.getElementById(sliderId + "_unit")
+    var unit = d.getElementById(sliderId + "_unit")
     if(unit){ unit.textContent = v === 1 ? "bead" : "beads" }
 }
 
 /* Copy engine n state into the settings form (shown when user expands panel). */
-function show_set(n){
+function show_set(n, doc){
+    var d = doc || document
     if(n==1){
-        setMenaceSliderValue("im1", menace[1]["start"][0], 1, 20)
-        setMenaceSliderValue("im3", menace[1]["start"][1], 1, 20)
-        setMenaceSliderValue("im5", menace[1]["start"][2], 1, 20)
-        setMenaceSliderValue("im7", menace[1]["start"][3], 1, 20)
+        setMenaceSliderValue("im1", menace[1]["start"][0], 1, 20, d)
+        setMenaceSliderValue("im3", menace[1]["start"][1], 1, 20, d)
+        setMenaceSliderValue("im5", menace[1]["start"][2], 1, 20, d)
+        setMenaceSliderValue("im7", menace[1]["start"][3], 1, 20, d)
     }
     if(n==2){
-        setMenaceSliderValue("im2", menace[2]["start"][0], 1, 20)
-        setMenaceSliderValue("im4", menace[2]["start"][1], 1, 20)
-        setMenaceSliderValue("im6", menace[2]["start"][2], 1, 20)
-        setMenaceSliderValue("im8", menace[2]["start"][3], 1, 20)
+        setMenaceSliderValue("im2", menace[2]["start"][0], 1, 20, d)
+        setMenaceSliderValue("im4", menace[2]["start"][1], 1, 20, d)
+        setMenaceSliderValue("im6", menace[2]["start"][2], 1, 20, d)
+        setMenaceSliderValue("im8", menace[2]["start"][3], 1, 20, d)
     }
-    setMenaceSliderValue("_"+n+"_ic_w", menace[n]["incentives"][1], 0, 20)
-    setMenaceSliderValue("_"+n+"_ic_d", menace[n]["incentives"][0], 0, 20)
-    setMenaceSliderValue("_"+n+"_ic_l", -menace[n]["incentives"][2], 0, 20)
-    document.getElementById("_"+n+"_includeall").checked = menace[n]["removesymm"]
-    document.getElementById("_"+n+"_tweak_h").style.display = "block"
-    document.getElementById("_"+n+"_tweak_s").style.display = "none"
+    setMenaceSliderValue("_"+n+"_ic_w", menace[n]["incentives"][1], 0, 20, d)
+    setMenaceSliderValue("_"+n+"_ic_d", menace[n]["incentives"][0], 0, 20, d)
+    setMenaceSliderValue("_"+n+"_ic_l", -menace[n]["incentives"][2], 0, 20, d)
+    d.getElementById("_"+n+"_includeall").checked = menace[n]["removesymm"]
+    d.getElementById("_"+n+"_tweak_h").style.display = "block"
+    d.getElementById("_"+n+"_tweak_s").style.display = "none"
 }
 
-function hide_set(n){
-    document.getElementById("_"+n+"_tweak_h").style.display = "none"
-    document.getElementById("_"+n+"_tweak_s").style.display = "block"
+function hide_set(n, doc){
+    var d = doc || document
+    d.getElementById("_"+n+"_tweak_h").style.display = "none"
+    d.getElementById("_"+n+"_tweak_s").style.display = "block"
+}
+
+/* Built-in starting configuration (same as initial menace-state). Does not rebuild matchboxes until Save. */
+function resetMenaceSettingsFormToDefaults(n, doc){
+    var d = doc || document
+    if(n === 1){
+        setMenaceSliderValue("im1", 8, 1, 20, d)
+        setMenaceSliderValue("im3", 4, 1, 20, d)
+        setMenaceSliderValue("im5", 2, 1, 20, d)
+        setMenaceSliderValue("im7", 1, 1, 20, d)
+    }
+    if(n === 2){
+        setMenaceSliderValue("im2", 8, 1, 20, d)
+        setMenaceSliderValue("im4", 4, 1, 20, d)
+        setMenaceSliderValue("im6", 2, 1, 20, d)
+        setMenaceSliderValue("im8", 1, 1, 20, d)
+    }
+    setMenaceSliderValue("_"+n+"_ic_w", 3, 0, 20, d)
+    setMenaceSliderValue("_"+n+"_ic_d", 1, 0, 20, d)
+    setMenaceSliderValue("_"+n+"_ic_l", 1, 0, 20, d)
+    var cb = d.getElementById("_"+n+"_includeall")
+    if(cb){ cb.checked = true }
 }
 
 /* One engine column: title, settings toggle, sliders, matchbox grid. */
@@ -73,6 +99,14 @@ function buildMenaceColumnHTML(n){
     var menacename = n === 2 ? "MENACE2" : "MENACE"
     var output = "<div class='menace-panel menace-panel-col' data-menace-col='"+n+"'>"
     output += "<h3 class='menace-col-heading'>"+menacename+"</h3>"
+    output += "<div class='menace-bead-legend' aria-label='Move color legend (each color is a board cell)'>"
+    output += "<div class='menace-bead-legend-grid'>"
+    for(var i=0;i<9;i++){
+        output += "<span class='bead bead-"+i+"' aria-hidden='true'></span>"
+    }
+    output += "</div>"
+    output += "<div class='menace-bead-legend-text'>Bead color = move cell</div>"
+    output += "</div>"
     output += "<div id='_"+n+"_tweak_s' class='menace-tweak-reveal'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"' class='menace-linkish'>Settings &#x25BC;</button></div>"
     output += "<div class='menace_settings' id='_"+n+"_tweak_h'>"
     output += "<div class='menace-tweak-hide'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"' class='menace-linkish'>&#x25B2; Hide settings</button></div>"
@@ -99,6 +133,7 @@ function buildMenaceColumnHTML(n){
     output += menaceIncentiveSliderRow(n, "d", "Draw", ic[0], 0, 20)
     output += menaceIncentiveSliderRow(n, "l", "Lose", -ic[2], 0, 20)
     output += "<div class='menace-settings-actions'>"
+    output += "<button type='button' class='menace-btn-solid' data-menace-action='reset-defaults' data-menace-id='"+n+"'>Reset to defaults</button>"
     output += "<button type='button' class='menace-btn-solid' data-menace-action='update' data-menace-id='"+n+"'>Save settings</button>"
     output += "<button type='button' class='menace-btn-solid menace-btn-warn' data-menace-action='update-reset' data-menace-id='"+n+"'>Save &amp; reset "+menacename+"</button>"
     output += "</div></div></div>"
@@ -173,9 +208,45 @@ function openMenacePanelsPopup(){
     w.document.write("<link rel=\"stylesheet\" href=\""+cssUrl+"\">")
     w.document.write("</head><body class=\"menace-popup-body\">")
     w.document.write(host.innerHTML)
-    w.document.write("<p class=\"menace-popup-note\"><em>View only.</em> Use the main window to play and change settings; reopen this window to refresh the view.</p>")
+    w.document.write("<p class=\"menace-popup-note\"><em>Play in the main window.</em> Settings work here too. After &ldquo;Save &amp; reset&rdquo;, pop out again to refresh the matchbox grid in this window.</p>")
     w.document.write("</body></html>")
     w.document.close()
+    menaceWirePopupPanelDocument(w)
+}
+
+/* Popout is static HTML: no bundled scripts run there. Wire delegated events to opener logic with this window's document. */
+function menaceWirePopupPanelDocument(w){
+    if(!w || !w.document || !w.document.body){ return }
+    var s = w.document.createElement("script")
+    s.textContent = [
+        "(function(){",
+        "var D=document;",
+        "var O=window.opener;",
+        "if(!O)return;",
+        "function onClick(e){",
+        "var el=e.target.closest(\"[data-menace-action]\");",
+        "if(!el)return;",
+        "var action=el.getAttribute(\"data-menace-action\");",
+        "if(action===\"popout-panels\")return;",
+        "var id=parseInt(el.getAttribute(\"data-menace-id\"),10);",
+        "if(id!==1&&id!==2)return;",
+        "if(action===\"show-settings\")O.show_set(id,D);",
+        "else if(action===\"hide-settings\")O.hide_set(id,D);",
+        "else if(action===\"reset-defaults\")O.resetMenaceSettingsFormToDefaults(id,D);",
+        "else if(action===\"update\")O.update_set(id,D);",
+        "else if(action===\"update-reset\")O.update_set_r(id,D);",
+        "}",
+        "function onInput(e){",
+        "var t=e.target;",
+        "if(t&&t.type===\"range\"&&t.classList.contains(\"menace-settings-slider\")&&O.syncMenaceSettingSliderDisplay){",
+        "O.syncMenaceSettingSliderDisplay(t,D);",
+        "}",
+        "}",
+        "D.addEventListener(\"click\",onClick);",
+        "D.addEventListener(\"input\",onInput);",
+        "})();"
+    ].join("")
+    w.document.body.appendChild(s)
 }
 
 /* id e.g. im1; value clamped 1..20 for initial HTML in show_menace. */
@@ -198,11 +269,12 @@ function menaceIncentiveSliderRow(n, kind, label, v, min, max){
     return "<div class='menace-slider-row menace-ic-row'><span class='menace-slider-label'>"+label+"</span><input type='range' min='"+min+"' max='"+max+"' step='1' class='slider menace-settings-slider' id='"+sid+"' aria-label='"+label+"' value='"+v+"' /><span class='menace-ic-value'>"+tail+"</span></div>"
 }
 
-function syncMenaceSettingSliderDisplay(el){
+function syncMenaceSettingSliderDisplay(el, doc){
     if(!el || el.type !== "range" || !el.classList.contains("menace-settings-slider")){ return }
-    var disp = document.getElementById(el.id + "_display")
+    var d = doc || document
+    var disp = d.getElementById(el.id + "_display")
     if(disp){ disp.textContent = el.value }
-    var unit = document.getElementById(el.id + "_unit")
+    var unit = d.getElementById(el.id + "_unit")
     if(unit){
         var nv = parseInt(el.value, 10)
         unit.textContent = nv === 1 ? "bead" : "beads"
@@ -227,6 +299,7 @@ function onMenaceDelegatedClick(e) {
     if (id !== 1 && id !== 2) return
     if (action === "show-settings") show_set(id)
     else if (action === "hide-settings") hide_set(id)
+    else if (action === "reset-defaults") resetMenaceSettingsFormToDefaults(id)
     else if (action === "update") update_set(id)
     else if (action === "update-reset") update_set_r(id)
 }
