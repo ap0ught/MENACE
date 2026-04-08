@@ -37,16 +37,35 @@ function getInterMoveDelayMs(){
 }
 
 function scheduleAutomation(fn, delayMs){
+    if(automationTimeoutId !== null){
+        window.clearTimeout(automationTimeoutId)
+        automationTimeoutId = null
+    }
     if(delayMs === null){
         automationResumePending = fn
         return
     }
     automationResumePending = null
-    window.setTimeout(fn, delayMs)
+    automationTimeoutId = window.setTimeout(function () {
+        automationTimeoutId = null
+        if(isPaused()){
+            automationResumePending = fn
+            return
+        }
+        automationResumePending = null
+        fn()
+    }, delayMs)
 }
 
 function resumeFromPauseIfNeeded(){
-    if(isPaused() || !automationResumePending){ return }
+    if(isPaused()){
+        if(automationTimeoutId !== null){
+            window.clearTimeout(automationTimeoutId)
+            automationTimeoutId = null
+        }
+        return
+    }
+    if(!automationResumePending){ return }
     var fn = automationResumePending
     automationResumePending = null
     fn()

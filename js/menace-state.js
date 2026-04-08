@@ -34,6 +34,8 @@ var player_x = "h"
 var whoA = {"h":"Human", "r":"Random", "m":"MENACE", "p":"Perfect"}
 /* When automation is paused (speed slider at 0), next callback to run after unpause. */
 var automationResumePending = null
+/* Pending automation timer (so pause can reliably cancel it). */
+var automationTimeoutId = null
 
 /* Learning curve: cumulative per-game outcome reward (one step per game; same convention as before). */
 var plotdata = [0]

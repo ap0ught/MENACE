@@ -17,6 +17,23 @@ function menaceMigratePlotStateFromV1(){
     if(g <= 0){
         return
     }
+    /* Synthesize a plausible result history so streak/rolling charts show something.
+       Exact per-game outcomes aren't available in v1; this keeps lengths consistent. */
+    var drawCount = Math.max(0, Math.min(g, wins_each[0] || 0))
+    var oCount = Math.max(0, Math.min(g - drawCount, wins_each[1] || 0))
+    var xCount = Math.max(0, Math.min(g - drawCount - oCount, wins_each[2] || 0))
+    for(var d=0;d<drawCount;d++){
+        result_history.push(0)
+    }
+    for(var o=0;o<oCount;o++){
+        result_history.push(1)
+    }
+    for(var x=0;x<xCount;x++){
+        result_history.push(2)
+    }
+    while(result_history.length < g){
+        result_history.push(0)
+    }
     for(var i=1;i<g;i++){
         plot_cum_o.push(Math.round(wins_each[1]*i/g))
         plot_cum_draw.push(Math.round(wins_each[0]*i/g))

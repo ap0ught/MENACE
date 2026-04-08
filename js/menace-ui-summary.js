@@ -42,10 +42,12 @@ function update_totals(n){
     var prev2 = plotdata_menace2[plotdata_menace2.length-1]
     var d1 = 0
     var d2 = 0
-    if(player_o === "m"){
+    /* Keep reinforcement chart aligned with actual bead updates:
+       only step for sides that recorded a trace this game. */
+    if((player_o === "m" || player_o === "h") && menace[1]["moves"] && menace[1]["moves"].length){
         d1 = menace[1]["incentives"][n]
     }
-    if(player_x === "m"){
+    if((player_x === "m" || player_x === "h") && menace[2]["moves"] && menace[2]["moves"].length){
         d2 = menace[2]["incentives"][opposite_result(n)]
     }
     plotdata.push(prev1 + d1)

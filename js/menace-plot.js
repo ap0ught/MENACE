@@ -208,7 +208,7 @@ function redraw_plot(){
     if(mode === "beads"){
         ctx.fillText("Cumulative per-game reinforcement (outcome reward sum)", 0, 0)
     } else if(mode === "wins"){
-        ctx.fillText("Cumulative draws, MENACE (O) wins, and X wins", 0, 0)
+        ctx.fillText("Cumulative draws, O wins, and X wins", 0, 0)
     } else {
         ctx.fillText("Rolling win rate (last N games)", 0, 0)
     }
@@ -232,8 +232,8 @@ function redraw_plot(){
         strokeSeries(c, ctx, plot_cum_x, "#16a34a")
         drawLegend(c, ctx, [
             { color: "#64748b", label: "Draws" },
-            { color: "#2563eb", label: "MENACE wins" },
-            { color: "#16a34a", label: "X wins (opp.)" }
+            { color: "#2563eb", label: "O wins" },
+            { color: "#16a34a", label: "X wins" }
         ])
     } else {
         if(result_history.length === 0){
@@ -254,7 +254,7 @@ function redraw_plot(){
             strokeSeries(c, ctx, arrO, "#2563eb")
             strokeSeries(c, ctx, arrX, "#16a34a")
             drawLegend(c, ctx, [
-                { color: "#2563eb", label: "MENACE win %" },
+                { color: "#2563eb", label: "O win %" },
                 { color: "#16a34a", label: "X win %" }
             ])
             ctx.textAlign = "left"
