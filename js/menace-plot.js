@@ -55,7 +55,9 @@ function buildRollingRates(side, win){
 function collectYsForLimits(mode){
     var ys = []
     if(plotdata.length < 1){ return [0] }
-    if(mode === "beads"){
+    if(mode === "rate"){
+        return [0, 100]
+    } else if(mode === "beads"){
         for(var i=0;i<plotdata.length;i++){
             ys.push(plotdata[i])
             ys.push(plotdata_menace2[i])
@@ -65,17 +67,6 @@ function collectYsForLimits(mode){
             ys.push(plot_cum_o[i])
             ys.push(plot_cum_draw[i])
             ys.push(plot_cum_x[i])
-        }
-    } else {
-        var W = getRollingWindow()
-        var rO = buildRollingRates(1, W)
-        var rX = buildRollingRates(2, W)
-        for(var i=1;i<rO.length;i++){
-            if(rO[i] !== null){ ys.push(rO[i]) }
-            if(rX[i] !== null){ ys.push(rX[i]) }
-        }
-        if(ys.length === 0){
-            return [0, 100]
         }
     }
     return ys
@@ -98,7 +89,8 @@ function updateplotlimits(mode){
         }
     }
     xmin = 0
-    xmax = Math.max(20, plotdata.length + 15)
+    var xbase = (mode === "rate") ? result_history.length + 1 : plotdata.length
+    xmax = Math.max(20, xbase + 15)
     xmax -= xmax % 10
     if(xmax <= xmin){
         xmax = xmin + 20
