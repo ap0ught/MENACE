@@ -264,13 +264,6 @@ table.board td button {
   text-align: left;
 }
 
-.speed-slider-value {
-  margin-left: 0.4rem;
-  font-variant-numeric: tabular-nums;
-  min-width: 3.25rem;
-  display: inline-block;
-}
-
 .human-move {
   position: absolute;
   top: 120px;
@@ -303,17 +296,6 @@ table.board td button {
   margin-bottom: 0.5rem;
   padding-bottom: 0.35rem;
   border-bottom: 1px solid #ddd;
-}
-
-.menace-combined-toolbar-popouts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.5rem;
-  align-items: center;
-}
-
-.menace-single-column-popout {
-  grid-template-columns: 1fr;
 }
 
 .menace-popout-btn {

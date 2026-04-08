@@ -36,24 +36,18 @@ function getInterMoveDelayMs(){
     return Math.max(5, Math.floor(d / 10))
 }
 
-/* When a timer is scheduled, remember fn so pausing can move it to automationResumePending. */
-var automationTimeoutFn = null
-
 function scheduleAutomation(fn, delayMs){
     if(automationTimeoutId !== null){
         window.clearTimeout(automationTimeoutId)
         automationTimeoutId = null
     }
-    automationTimeoutFn = null
     if(delayMs === null){
         automationResumePending = fn
         return
     }
     automationResumePending = null
-    automationTimeoutFn = fn
     automationTimeoutId = window.setTimeout(function () {
         automationTimeoutId = null
-        automationTimeoutFn = null
         if(isPaused()){
             automationResumePending = fn
             return
@@ -68,11 +62,6 @@ function resumeFromPauseIfNeeded(){
         if(automationTimeoutId !== null){
             window.clearTimeout(automationTimeoutId)
             automationTimeoutId = null
-            /* Slider hit 0 before the next AI move ran — keep that move on the queue. */
-            if(automationTimeoutFn){
-                automationResumePending = automationTimeoutFn
-                automationTimeoutFn = null
-            }
         }
         return
     }
@@ -94,15 +83,6 @@ function updateSpeedVisibility(){
     var sd = document.getElementById("speeddiv")
     if(!sd){ return }
     sd.style.display = hasAnyAi() ? "block" : "none"
-}
-
-/* Show raw slider value (0–1000) or Pause when at zero. */
-function updateSpeedDisplay(){
-    var ss = document.getElementById("speed_slider")
-    var disp = document.getElementById("speed_slider_display")
-    if(!ss || !disp){ return }
-    var v = parseInt(ss.value, 10)
-    disp.textContent = (isNaN(v) || v <= 0) ? "Pause" : String(v)
 }
 
 /* Empty cell on main grid; click buttons when either side can be human. */
@@ -367,15 +347,6 @@ function updateHumanMoveControls(){
     inp.focus()
 }
 
-function openCellNumbersMessage(){
-    var nums = []
-    for(var i = 0; i < 9; i++){
-        if(board[i] === 0){ nums.push(CELL_NUM_FOR_BOARD_IDX[i]) }
-    }
-    nums.sort(function (a, b){ return a - b })
-    return nums.length ? nums.join(", ") : "none"
-}
-
 function submitHumanCellInput(){
     var inp = document.getElementById("human_cell_input")
     if(!inp || inp.disabled){ return }
@@ -385,8 +356,7 @@ function submitHumanCellInput(){
     }
     var idx = BOARD_IDX_FOR_CELL_NUM[n - 1]
     if(board[idx] !== 0){
-        var occ = board[idx] === 1 ? "O" : "X"
-        say("Cell " + n + " is already taken (" + occ + "). Open cells: " + openCellNumbersMessage() + ".")
+        say("That cell is already taken.")
         inp.value = ""
         return
     }
