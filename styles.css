@@ -1,4 +1,7 @@
-table.moves tr,
+table.moves tr {
+  border: 0;
+}
+
 table.moves {
   border: 0;
   border-collapse: separate;
@@ -333,10 +336,6 @@ table.board td button {
   align-items: center;
 }
 
-.menace-single-column-popout {
-  grid-template-columns: 1fr;
-}
-
 .menace-popout-btn {
   font: inherit;
   font-size: 0.85rem;
@@ -349,6 +348,10 @@ table.board td button {
   grid-template-columns: 1fr 1fr;
   gap: 0 14px;
   align-items: start;
+}
+
+.menace-two-columns.menace-single-column-popout {
+  grid-template-columns: 1fr;
 }
 
 .menace-two-columns > .menace-panel-col:first-child {
