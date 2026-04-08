@@ -82,6 +82,27 @@ function resumeFromPauseIfNeeded(){
     fn()
 }
 
+/* No beads in matchbox: pause speed slider and queue retry of this engine’s move after unpause. */
+function pauseAutomationForMenaceRetry(engineNum){
+    if(automationTimeoutId !== null){
+        window.clearTimeout(automationTimeoutId)
+        automationTimeoutId = null
+    }
+    automationTimeoutFn = null
+    automationResumePending = function () {
+        if(engineNum === 1){
+            play_o_side()
+        } else {
+            play_x_side()
+        }
+    }
+    var ss = document.getElementById("speed_slider")
+    if(ss){
+        ss.value = "0"
+    }
+    updateSpeedDisplay()
+}
+
 function scheduleAfterGame(fn){
     if(hasAnyHuman()){
         window.setTimeout(fn, 1000)
@@ -227,13 +248,14 @@ function play_o_side(){
         return
     }
     if(where === "resign"){
-        if(count(board, 0) === 9){
-            say("O cannot open — no beads in the first box.")
-            playagain = false
+        if(menace[1]["noBeads"] === "pause"){
+            say("O cannot move — no beads in this matchbox. Automation paused.")
+            pauseAutomationForMenaceRetry(1)
             return
         }
-        do_win(2)
-        say("O resigns.")
+        restoreMenaceMatchboxFromStartingBeads(1, board)
+        say("MENACE O: matchbox reset to starting beads; retrying move.")
+        play_o_side()
         return
     }
     board[where] = 1
@@ -262,8 +284,14 @@ function play_x_side(){
         return
     }
     if(where === "resign"){
-        do_win(1)
-        say("X resigns.")
+        if(menace[2]["noBeads"] === "pause"){
+            say("X cannot move — no beads in this matchbox. Automation paused.")
+            pauseAutomationForMenaceRetry(2)
+            return
+        }
+        restoreMenaceMatchboxFromStartingBeads(2, board)
+        say("MENACE X: matchbox reset to starting beads; retrying move.")
+        play_x_side()
         return
     }
     board[where] = 2

@@ -32,6 +32,30 @@ function new_box(pos,n,start){
     return box
 }
 
+/* Canonical position string for the current board (same rotation as get_menace_move). */
+function menaceCanonicalPosFromBoard(boardArr){
+    var pos = boardArr.join("")
+    var which_rot = find_rotation(pos)
+    return apply_rotation(pos,rotations[which_rot])
+}
+
+/* Phase index 0..3 into start[] / orderedBoxes for engine n before its next move. */
+function menaceMovePhaseIndex(n, boardArr){
+    if(n === 1){
+        return count(boardArr, 1)
+    }
+    return count(boardArr, 2)
+}
+
+/* Rebuild one matchbox from configured starting beads for this turn (after empty-bead resign). */
+function restoreMenaceMatchboxFromStartingBeads(n, boardArr){
+    var pos = menaceCanonicalPosFromBoard(boardArr)
+    var s = menaceMovePhaseIndex(n, boardArr)
+    menace[n]["boxes"][pos] = new_box(pos, n, menace[n]["start"][s])
+    update_box(pos, n)
+    menaceScheduleSave()
+}
+
 /* DFS over partial games; registers canonical positions for the engine that moves next. */
 function search_moves(b, n){
     var played = 10 - count(b,0)
@@ -126,6 +150,10 @@ function update_set(n, doc){
     menace[n]["incentives"][1] = parseInt(d.getElementById("_"+n+"_ic_w").value, 10)
     menace[n]["incentives"][0] = parseInt(d.getElementById("_"+n+"_ic_d").value, 10)
     menace[n]["incentives"][2] = -parseInt(d.getElementById("_"+n+"_ic_l").value, 10)
+    var nb = d.getElementById("_"+n+"_no_beads")
+    if(nb){
+        menace[n]["noBeads"] = nb.value === "pause" ? "pause" : "reset"
+    }
     hide_set(n, doc)
 }
 

@@ -14,7 +14,8 @@
    boxes[posString] = array of 9 bead counts (legal moves only, after symmetry).
    orderedBoxes[0..3] = position keys grouped by move number (1st/2nd/… in that engine).
    start[0..3] = initial beads for 1st, 3rd, 5th, 7th moves (engine 1) or 2nd/4th/6th/8th (engine 2).
-   incentives indexed by game result code used in update_totals (see menace-ui-summary). */
+   incentives indexed by game result code used in update_totals (see menace-ui-summary).
+   noBeads: when a chosen matchbox has zero beads — "pause" (speed to pause) or "reset" (refill from start[]). */
 var menace = {
  1:{
     "boxes":{},
@@ -22,6 +23,7 @@ var menace = {
     "start":[8,4,2,1],
     "removesymm":true,
     "incentives":[1,3,-1],
+    "noBeads":"reset",
     "moves":[],
     "player":1},
  2:{
@@ -30,6 +32,7 @@ var menace = {
     "start":[8,4,2,1],
     "removesymm":true,
     "incentives":[1,3,-1],
+    "noBeads":"reset",
     "moves":[],
     "player":2}
 }
