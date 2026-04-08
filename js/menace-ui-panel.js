@@ -12,7 +12,7 @@ function make_ox(pos,n){
         output += "<td id='"+pfx+pos+"-"+i+"' class='p"+i
         if(pos[i] == 0){
             var beads = (menace[n]["boxes"][pos] && menace[n]["boxes"][pos][i] !== undefined) ? menace[n]["boxes"][pos][i] : 0
-            output += " num'>"+beads+"</td>"
+            output += " num'><span class='bead bead-"+i+"' aria-hidden='true'></span><span class='bead-count'>"+beads+"</span></td>"
         } else {
             output += "'>"
             output += pieces[pos[i]]
@@ -99,6 +99,14 @@ function buildMenaceColumnHTML(n){
     var menacename = n === 2 ? "MENACE2" : "MENACE"
     var output = "<div class='menace-panel menace-panel-col' data-menace-col='"+n+"'>"
     output += "<h3 class='menace-col-heading'>"+menacename+"</h3>"
+    output += "<div class='menace-bead-legend' aria-label='Move color legend (each color is a board cell)'>"
+    output += "<div class='menace-bead-legend-grid'>"
+    for(var i=0;i<9;i++){
+        output += "<span class='bead bead-"+i+"' aria-hidden='true'></span>"
+    }
+    output += "</div>"
+    output += "<div class='menace-bead-legend-text'>Bead color = move cell</div>"
+    output += "</div>"
     output += "<div id='_"+n+"_tweak_s' class='menace-tweak-reveal'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"' class='menace-linkish'>Settings &#x25BC;</button></div>"
     output += "<div class='menace_settings' id='_"+n+"_tweak_h'>"
     output += "<div class='menace-tweak-hide'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"' class='menace-linkish'>&#x25B2; Hide settings</button></div>"
