@@ -154,6 +154,9 @@ function update_set(n, doc){
     if(nb){
         menace[n]["noBeads"] = nb.value === "pause" ? "pause" : "reset"
     }
+    if(typeof menaceScheduleSave === "function"){
+        menaceScheduleSave()
+    }
     hide_set(n, doc)
 }
 
