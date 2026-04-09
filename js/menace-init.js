@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     updateSpeedVisibility()
     updatePlayerModeHelp()
+    updatePlayerMatchboxTrackIndicators()
     document.addEventListener("click", onMenaceDelegatedClick)
     document.addEventListener("input", function (e) {
         var t = e.target
