@@ -329,8 +329,84 @@ table.board td button {
   font: inherit;
   color: #1a1a1a;
   max-width: 11rem;
-  margin-top: 0.2rem;
   display: block;
+}
+
+.player-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  max-width: 100%;
+}
+
+.player-picker-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.player-picker-row select {
+  margin-top: 0;
+}
+
+/* Read-only indicator: this side’s play is recorded into MENACE O / MENACE X matchboxes when Human or MENACE. */
+.player-matchbox-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #f8fafc;
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.player-matchbox-track-caption {
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.player-matchbox-track.is-training {
+  border-color: #15803d;
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.player-matchbox-track.is-training .player-matchbox-track-caption {
+  color: #166534;
+}
+
+.player-matchbox-track-box {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #94a3b8;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.player-matchbox-track.is-training .player-matchbox-track-box {
+  border-color: #15803d;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.player-matchbox-track.is-training .player-matchbox-track-box::after {
+  content: "✓";
 }
 
 .player-label {
@@ -339,6 +415,7 @@ table.board td button {
   vertical-align: top;
   line-height: 1.45;
   max-width: 240px;
+  font-weight: 600;
 }
 
 .player-help {
@@ -397,6 +474,11 @@ table.board td button {
   font-size: 0.95rem;
   line-height: 1.5;
   color: #1a1a1a;
+}
+
+.player-block .player-learner-tag {
+  margin-left: 0;
+  margin-top: 0.1rem;
 }
 
 .player-learner-tag {

@@ -39,22 +39,42 @@
     <td id="pos8" class="p8" data-cell-n="3"></td>
 </tr>
 </table>
-<div class="players"><label class="player-label">O:<br /><select id="p1picker" aria-label="Player O (first move); MENACE uses the MENACE O learner (left panel)">
+<div class="players">
+<div class="player-block">
+<label class="player-label" for="p1picker">O:</label>
+<div class="player-picker-row">
+<select id="p1picker" aria-label="Player O (first move); MENACE uses the MENACE O learner (left panel)">
 <option value="h">Human</option>
 <option value="r">Random</option>
 <option value="m">MENACE</option>
 <option value="p">Perfect</option>
 </select>
+<div class="player-matchbox-track" id="p1_matchbox_track" role="status" aria-live="polite">
+<span class="player-matchbox-track-box" aria-hidden="true"></span>
+<span class="player-matchbox-track-caption">MENACE O</span>
+</div>
+</div>
 <span class="player-learner-tag" title="If you pick MENACE here, moves train the learner saved as MENACE O (left column).">MENACE O</span>
-<p class="player-help" id="p1_help" hidden></p></label>
-<label class="player-label">X:<br /><select id="p2picker" aria-label="Player X (second move); MENACE uses the MENACE X learner (right panel)">
+<p class="player-help" id="p1_help" hidden></p>
+</div>
+<div class="player-block">
+<label class="player-label" for="p2picker">X:</label>
+<div class="player-picker-row">
+<select id="p2picker" aria-label="Player X (second move); MENACE uses the MENACE X learner (right panel)">
 <option value="h">Human</option>
 <option value="r">Random</option>
 <option value="m">MENACE</option>
 <option value="p">Perfect</option>
 </select>
+<div class="player-matchbox-track" id="p2_matchbox_track" role="status" aria-live="polite">
+<span class="player-matchbox-track-box" aria-hidden="true"></span>
+<span class="player-matchbox-track-caption">MENACE X</span>
+</div>
+</div>
 <span class="player-learner-tag" title="If you pick MENACE here, moves train the learner saved as MENACE X (right column).">MENACE X</span>
-<p class="player-help" id="p2_help" hidden></p></label></div>
+<p class="player-help" id="p2_help" hidden></p>
+</div>
+</div>
 <div class="wins" id="n1"><small>O wins</small><div class="dis" id="dis1">0</div></div>
 <div class="wins" id="n2"><small>Draws</small><div class="dis" id="dis0">0</div></div>
 <div class="wins" id="n3"><small>X wins</small><div class="dis" id="dis2">0</div></div>

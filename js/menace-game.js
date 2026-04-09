@@ -163,6 +163,32 @@ function new_game(){
     }
 }
 
+/* Human and MENACE both record moves for reinforcement; Random/Perfect do not (see menace_add_beads). */
+function updatePlayerMatchboxTrackIndicators(){
+    var t1 = document.getElementById("p1_matchbox_track")
+    var t2 = document.getElementById("p2_matchbox_track")
+    var trainO = player_o === "m" || player_o === "h"
+    var trainX = player_x === "m" || player_x === "h"
+    if(t1){
+        t1.classList.toggle("is-training", trainO)
+        t1.setAttribute(
+            "aria-label",
+            trainO
+                ? "O: moves are recorded and reinforce the MENACE O matchboxes after each game."
+                : "O: moves are not training matchboxes (Random or Perfect)."
+        )
+    }
+    if(t2){
+        t2.classList.toggle("is-training", trainX)
+        t2.setAttribute(
+            "aria-label",
+            trainX
+                ? "X: moves are recorded and reinforce the MENACE X matchboxes after each game."
+                : "X: moves are not training matchboxes (Random or Perfect)."
+        )
+    }
+}
+
 function updatePlayerModeHelp(){
     var h1 = document.getElementById("p1_help")
     var h2 = document.getElementById("p2_help")
@@ -205,6 +231,7 @@ function syncPlayersFromPickers(){
         menaceScheduleSave()
     }
     updatePlayerModeHelp()
+    updatePlayerMatchboxTrackIndicators()
     updateSpeedVisibility()
     updateHumanMoveControls()
     if(!human_turn){ return }
@@ -354,7 +381,7 @@ function play_human(where){
             return
         }
         var boardBefore = board.slice()
-        if(player_o === "h" && (player_x === "m" || player_x === "h")){
+        if(player_o === "h"){
             recordHumanLearnerMove(1, boardBefore, where)
         }
         human_turn = false
@@ -371,7 +398,7 @@ function play_human(where){
         return
     }
     var boardBeforeO = board.slice()
-    if(player_x === "h" && (player_o === "m" || player_o === "h")){
+    if(player_x === "h"){
         recordHumanLearnerMove(2, boardBeforeO, where)
     }
     human_turn = false
