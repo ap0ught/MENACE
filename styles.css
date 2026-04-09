@@ -387,8 +387,10 @@ table.board td button {
 }
 
 .player-matchbox-track-box {
-  width: 14px;
-  height: 14px;
+  width: auto;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 2px;
   border: 2px solid #94a3b8;
   border-radius: 2px;
   display: flex;
@@ -397,6 +399,41 @@ table.board td button {
   background: #fff;
   font-size: 11px;
   line-height: 1;
+  box-sizing: border-box;
+}
+
+/* Canonical 3×3 for the last matchbox position (MENACE or human learner). */
+.matchbox-track-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 10px);
+  grid-template-rows: repeat(3, 10px);
+  gap: 1px;
+  align-items: center;
+  justify-items: center;
+}
+
+.matchbox-track-mini-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 8px;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.matchbox-track-mini-cell.mini-empty {
+  background: #f1f5f9;
+  border-radius: 1px;
+}
+
+.matchbox-track-mini-cell.mini-o {
+  color: #0f172a;
+}
+
+.matchbox-track-mini-cell.mini-x {
+  color: #0f172a;
 }
 
 .player-matchbox-track.is-training .player-matchbox-track-box {
@@ -405,8 +442,8 @@ table.board td button {
   color: #15803d;
 }
 
-.player-matchbox-track.is-training .player-matchbox-track-box::after {
-  content: "✓";
+.player-matchbox-track.is-training .player-matchbox-track-box.has-mini-board {
+  color: #0f172a;
 }
 
 .player-label {

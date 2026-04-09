@@ -90,6 +90,11 @@ function order_boxes(n){
 /* Clear learning for engine(s), rebuild all boxes from scratch, redraw UI, start a game. */
 function reset_menace(n){
     playagain = true
+    menaceLastBoxPos[1] = null
+    menaceLastBoxPos[2] = null
+    if(typeof renderMenaceMatchboxTrackBoxes === "function"){
+        renderMenaceMatchboxTrackBoxes()
+    }
     for(var i=1;i<=2;i++){
         if(n==i || n=="both"){
             menace[i]["orderedBoxes"] = [[],[],[],[]]
@@ -189,6 +194,9 @@ function get_menace_move(n){
                 inv_where = i
             }
         }
+        if(typeof setMenaceLastBoxUsed === "function"){
+            setMenaceLastBoxUsed(n, menaceCanonicalPosFromBoard(board))
+        }
     } else {
         var pos = board.join("")
         var which_rot = find_rotation(pos)
@@ -200,6 +208,9 @@ function get_menace_move(n){
         if(hl){ hl.style.color = "#FF0000" }
         inv_where = rotations[which_rot][where]
         menace[n]["moves"].push([pos,where])
+        if(typeof setMenaceLastBoxUsed === "function"){
+            setMenaceLastBoxUsed(n, pos)
+        }
     }
     return inv_where
 }
@@ -207,6 +218,9 @@ function get_menace_move(n){
 /* Human move: record in learner n’s trace (canonical pos + slot), mirroring get_menace_move(n). */
 function recordHumanLearnerMove(engineId, boardBefore, realWhere){
     if(count(boardBefore,0) == 1){
+        if(typeof setMenaceLastBoxUsed === "function"){
+            setMenaceLastBoxUsed(engineId, menaceCanonicalPosFromBoard(boardBefore))
+        }
         return
     }
     var posStr = boardBefore.join("")
@@ -223,6 +237,9 @@ function recordHumanLearnerMove(engineId, boardBefore, realWhere){
     menace[engineId]["moves"].push([posCanon, whereCanon])
     var hl = document.getElementById("m"+engineId+"-"+posCanon+"-"+whereCanon)
     if(hl){ hl.style.color = "#FF0000" }
+    if(typeof setMenaceLastBoxUsed === "function"){
+        setMenaceLastBoxUsed(engineId, posCanon)
+    }
 }
 
 function recordMenace2HumanMove(boardBefore, realWhere){

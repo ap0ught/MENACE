@@ -154,13 +154,71 @@ function new_game(){
     if(playagain){
         menace[1]["moves"] = []
         menace[2]["moves"] = []
+        menaceLastBoxPos[1] = null
+        menaceLastBoxPos[2] = null
         board = [0,0,0,0,0,0,0,0,0]
         no_winner = true
         for(var i=0;i<9;i++){
             mainBoardCellClear(i)
         }
         continueGame()
+        renderMenaceMatchboxTrackBoxes()
     }
+}
+
+/* Updates the small 3×3 preview next to O/X pickers to match the last canonical matchbox used. */
+function setMenaceLastBoxUsed(engineNum, posStr){
+    menaceLastBoxPos[engineNum] = posStr
+    renderMenaceMatchboxTrackBox(engineNum)
+}
+
+function renderMenaceMatchboxTrackBoxes(){
+    renderMenaceMatchboxTrackBox(1)
+    renderMenaceMatchboxTrackBox(2)
+}
+
+function renderMenaceMatchboxTrackBox(engineNum){
+    var tid = engineNum === 1 ? "p1_matchbox_track" : "p2_matchbox_track"
+    var tr = document.getElementById(tid)
+    if(!tr){ return }
+    var boxEl = tr.querySelector(".player-matchbox-track-box")
+    if(!boxEl){ return }
+    var train = engineNum === 1 ? (player_o === "m" || player_o === "h") : (player_x === "m" || player_x === "h")
+    while(boxEl.firstChild){
+        boxEl.removeChild(boxEl.firstChild)
+    }
+    if(!train){
+        boxEl.classList.remove("has-mini-board")
+        return
+    }
+    boxEl.classList.add("has-mini-board")
+    var posStr = menaceLastBoxPos[engineNum]
+    var grid = document.createElement("div")
+    grid.className = "matchbox-track-mini"
+    if(posStr && posStr.length === 9){
+        grid.setAttribute("role", "img")
+        grid.setAttribute("aria-label", "Last matchbox position used (canonical 3×3)")
+    }
+    for(var r = 0; r < 3; r++){
+        for(var c = 0; c < 3; c++){
+            var idx = r * 3 + c
+            var cell = document.createElement("span")
+            cell.className = "matchbox-track-mini-cell"
+            var ch = posStr && posStr.length === 9 ? posStr.charAt(idx) : "0"
+            if(ch === "1"){
+                cell.textContent = pieces[1]
+                cell.classList.add("mini-o")
+            } else if(ch === "2"){
+                cell.textContent = pieces[2]
+                cell.classList.add("mini-x")
+            } else {
+                cell.classList.add("mini-empty")
+                cell.textContent = "\u00A0"
+            }
+            grid.appendChild(cell)
+        }
+    }
+    boxEl.appendChild(grid)
 }
 
 /* Human and MENACE both record moves for reinforcement; Random/Perfect do not (see menace_add_beads). */
@@ -171,22 +229,25 @@ function updatePlayerMatchboxTrackIndicators(){
     var trainX = player_x === "m" || player_x === "h"
     if(t1){
         t1.classList.toggle("is-training", trainO)
+        var oBase = trainO
+            ? "O: moves are recorded and reinforce the MENACE O matchboxes after each game."
+            : "O: moves are not training matchboxes (Random or Perfect)."
         t1.setAttribute(
             "aria-label",
-            trainO
-                ? "O: moves are recorded and reinforce the MENACE O matchboxes after each game."
-                : "O: moves are not training matchboxes (Random or Perfect)."
+            trainO && menaceLastBoxPos[1] ? oBase + " Small grid: last matchbox position used." : oBase
         )
     }
     if(t2){
         t2.classList.toggle("is-training", trainX)
+        var xBase = trainX
+            ? "X: moves are recorded and reinforce the MENACE X matchboxes after each game."
+            : "X: moves are not training matchboxes (Random or Perfect)."
         t2.setAttribute(
             "aria-label",
-            trainX
-                ? "X: moves are recorded and reinforce the MENACE X matchboxes after each game."
-                : "X: moves are not training matchboxes (Random or Perfect)."
+            trainX && menaceLastBoxPos[2] ? xBase + " Small grid: last matchbox position used." : xBase
         )
     }
+    renderMenaceMatchboxTrackBoxes()
 }
 
 function updatePlayerModeHelp(){
