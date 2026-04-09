@@ -120,17 +120,19 @@ table.board:not(.large) td {
   vertical-align: middle;
 }
 
+/* Do not set display:flex on <td> — it exits the table formatting context and the 3×3 grid collapses to a single column. */
 table.board:not(.large) td.num {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+  vertical-align: middle;
+  text-align: center;
   min-width: 30px;
   min-height: 40px;
   width: auto;
   height: auto;
   padding: 5px 4px;
+}
+
+table.board:not(.large) td.num .bead {
+  margin-bottom: 4px;
 }
 
 table.board:not(.large) td:not(.num) {
@@ -347,16 +349,26 @@ table.board td button {
   font-weight: normal;
 }
 
+/* Upper area, left of the matchbox panel — avoids covering the win/draw boxes below the board. */
 .speed {
   position: absolute;
-  top: 222px;
-  left: 280px;
+  top: 24px;
+  right: calc(12px + min(68vw, 820px) + 16px);
+  left: auto;
   text-align: left;
   font-size: 0.95rem;
   line-height: 1.5;
   color: #1a1a1a;
-  max-width: 240px;
+  max-width: min(240px, calc(100vw - 24px));
   padding-top: 0.15rem;
+  z-index: 1;
+}
+
+@media (max-width: 520px) {
+  .speed {
+    left: 12px;
+    right: auto;
+  }
 }
 
 .speed-slider-value {
@@ -407,6 +419,7 @@ table.board td button {
   position: absolute;
   right: 12px;
   top: 12px;
+  z-index: 2;
   max-width: min(68vw, 820px);
   max-height: calc(100vh - 24px);
   overflow: auto;
