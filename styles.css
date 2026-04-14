@@ -463,26 +463,15 @@ table.board td button {
   font-weight: normal;
 }
 
-/* Upper area, left of the matchbox panel — avoids covering the win/draw boxes below the board. */
+/* Directly above the streak indicator inside .graph-section (same column as chart). */
 .speed {
-  position: absolute;
-  top: 24px;
-  right: calc(12px + min(68vw, 820px) + 16px);
-  left: auto;
   text-align: left;
   font-size: 0.95rem;
   line-height: 1.5;
   color: #1a1a1a;
-  max-width: min(240px, calc(100vw - 24px));
+  max-width: 520px;
+  margin-bottom: 10px;
   padding-top: 0.15rem;
-  z-index: 1;
-}
-
-@media (max-width: 520px) {
-  .speed {
-    left: 12px;
-    right: auto;
-  }
 }
 
 .speed-slider-value {
@@ -594,6 +583,19 @@ table.board td button {
 .menace-panel-col {
   min-width: 0;
   overflow: visible;
+}
+
+/* Main column while matchboxes are in a child window: show settings, hide matchbox grid and Settings toggle. */
+.menace-panel-col.menace-col-matchboxes-popout .menace-tweak-reveal {
+  display: none;
+}
+
+.menace-panel-col.menace-col-matchboxes-popout .menace-tweak-hide {
+  display: none;
+}
+
+.menace-panel-col.menace-col-matchboxes-popout .menace_settings {
+  display: block;
 }
 
 .menace-col-heading {

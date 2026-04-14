@@ -195,10 +195,6 @@ function renderMenaceMatchboxTrackBox(engineNum){
     var posStr = menaceLastBoxPos[engineNum]
     var grid = document.createElement("div")
     grid.className = "matchbox-track-mini"
-    if(posStr && posStr.length === 9){
-        grid.setAttribute("role", "img")
-        grid.setAttribute("aria-label", "Last matchbox position used (canonical 3×3)")
-    }
     for(var r = 0; r < 3; r++){
         for(var c = 0; c < 3; c++){
             var idx = r * 3 + c

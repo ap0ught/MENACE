@@ -1,4 +1,4 @@
-const CACHE_VERSION = "menace-pwa-v1";
+const CACHE_VERSION = "menace-pwa-v2";
 
 const SW_DIR = new URL(".", self.location.href).href;
 function asset(rel) {

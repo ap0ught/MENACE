@@ -6,7 +6,7 @@ This project is a **static, client-only** tic-tac-toe demo. It does not send dat
 
 ## Hardening in this repository
 
-- **Content-Security-Policy** (CSP) in `index.html` restricts scripts and styles to same-origin files only, blocks frames, plugins, and network fetches from the page, and disallows dangerous URL handlers (`javascript:`) by omitting `'unsafe-inline'` for scripts.
+- **Content-Security-Policy** (CSP) in `index.html` restricts scripts and styles to same-origin files only, blocks frames and plugins, limits network connections to **same origin** (`connect-src 'self'`), and disallows dangerous URL handlers (`javascript:`) by omitting broad `'unsafe-inline'` for scripts. Two **SHA-256 hashes** in `script-src` allow only the known inline snippets injected locally by **live-server** (live reload) and by **Cursor’s embedded browser**; other inline scripts remain blocked.
 - **No inline script handlers** — UI actions use `addEventListener` and delegated clicks on `data-menace-action` buttons instead of `javascript:` links or inline `onsubmit`.
 - **Text-first UI updates** where practical — status lines and scores use `textContent` instead of HTML concatenation to avoid accidental markup injection.
 - `referrer` meta set to `strict-origin-when-cross-origin`.
@@ -18,4 +18,4 @@ If you discover a security issue in this repository, please open a **private** s
 
 ## Deployment
 
-For production, **repeat the same CSP (or stricter) as HTTP response headers** on your static host; meta CSP is a baseline and headers can add HSTS, etc., at the edge.
+For production, **repeat the same CSP (or stricter) as HTTP response headers** on your static host; meta CSP is a baseline and headers can add HSTS, etc., at the edge. Use headers for **`frame-ancestors`** (embedding / clickjacking): browsers ignore that directive in `<meta>` tags, so it is not set in `index.html`.
