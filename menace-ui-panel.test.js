@@ -219,6 +219,21 @@ describe('menace-ui-panel.js', () => {
       expect(html).toContain("2nd move")
       expect(html).toContain("data-menace-col='2'")
     })
+
+    it('matchboxes-only mode has grids but no settings form', () => {
+      const html = global.buildMenaceColumnHTML(1, 'matchboxes-only')
+      expect(html).toContain("m1_board_")
+      expect(html).toContain("matchboxes total")
+      expect(html).not.toContain("_1_tweak_h")
+      expect(html).not.toContain("show-settings")
+    })
+
+    it('settings-dock mode has settings but no matchbox td ids', () => {
+      const html = global.buildMenaceColumnHTML(1, 'settings-dock')
+      expect(html).toContain("_1_tweak_h")
+      expect(html).toContain("menace-col-matchboxes-popout")
+      expect(html).not.toContain("m1_board_")
+    })
   })
 
   describe('showMenacePanels', () => {

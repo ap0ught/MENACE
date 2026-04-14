@@ -127,6 +127,9 @@ function reset_menace(n){
         }
     }
     showMenacePanels()
+    if(typeof menaceRefreshOpenPopoutGrids === "function"){
+        menaceRefreshOpenPopoutGrids()
+    }
     new_game()
 }
 

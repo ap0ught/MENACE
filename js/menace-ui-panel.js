@@ -3,6 +3,11 @@
 /* Single combined panel: MENACE O | MENACE X */
 /*************************************/
 
+/* When true, engine n matchboxes live in a child window; main column shows settings only. */
+var menaceMatchboxesPopoutOpen = { 1: false, 2: false }
+var menacePopoutWindowRef = { 1: null, 2: null }
+var menacePopoutPollId = null
+
 /* Mini-board cell ids are prefixed by engine n so both columns can coexist. */
 function make_ox(pos,n){
     var pfx = "m"+n+"-"
@@ -27,6 +32,11 @@ function make_ox(pos,n){
 function update_box(key,n){
     var wrap = document.getElementById("m"+n+"_board_"+key)
     if(wrap){ wrap.innerHTML = make_ox(key,n) }
+    var w = menacePopoutWindowRef[n]
+    if(w && !w.closed){
+        var pw = w.document.getElementById("m"+n+"_board_"+key)
+        if(pw){ pw.innerHTML = make_ox(key,n) }
+    }
 }
 
 /* Clamp and sync a range input plus its paired _display span (id + "_display"). */
@@ -70,6 +80,9 @@ function show_set(n, doc){
 
 function hide_set(n, doc){
     var d = doc || document
+    if(menaceMatchboxesPopoutOpen[n] && d === document){
+        return
+    }
     d.getElementById("_"+n+"_tweak_h").style.display = "none"
     d.getElementById("_"+n+"_tweak_s").style.display = "block"
 }
@@ -98,11 +111,52 @@ function resetMenaceSettingsFormToDefaults(n, doc){
     if(nb){ nb.value = "reset" }
 }
 
-/* One engine column: title, settings toggle, sliders, matchbox grid. */
-function buildMenaceColumnHTML(n){
+/* Matchbox grids + intro line only (used in pop-out window). */
+function buildMenaceMatchboxesTablesHTML(n){
+    var boxout = ""
+    var numb = 0
+    for(var move=0;move<menace[n]["orderedBoxes"].length;move++){
+        var moven = move * 2 + n;
+        var ord = menace[n]["orderedBoxes"][move]
+        if(moven == 1){
+            boxout += "<div class='menace-move-group'>1st move &middot; 1 box</div>";
+        } else {
+            var ordWord = ["","second","third","fourth","fifth","sixth","seventh","eighth","ninth"][moven-1] || ("move "+moven)
+            boxout += "<div class='menace-move-group'>"+ordWord+" move &middot; "+ord.length+" boxes</div>";
+        }
+        var cols = 0
+        boxout += "<div class='menace-moves-wrap'><table class='moves'>"
+        for(var k=0;k<ord.length;k++){
+            var key = ord[k]
+            if(cols == 0){
+                boxout += "<tr>"
+            }
+            cols += 1
+            numb += 1
+            boxout += "<td class='board' id='m"+n+"_board_"+key+"'>"+make_ox(key,n)+"</td>"
+            if(cols == 7){
+                boxout += "</tr>"
+                cols = 0
+            }
+        }
+        if(cols != 0){
+            boxout += "</tr>"
+        }
+        boxout += "</table></div>"
+    }
+    return "<p class='menace-matchbox-intro'><strong>"+numb+"</strong> matchboxes total</p>" + boxout
+}
+
+/* mode: omitted | "full" — default; "matchboxes-only" — pop-out; "settings-dock" — main column while matchboxes are popped out. */
+function buildMenaceColumnHTML(n, mode){
+    mode = mode || "full"
     /* Engine 1 = noughts learner (O), engine 2 = crosses learner (X). */
     var menacename = n === 2 ? "MENACE X" : "MENACE O"
-    var output = "<div class='menace-panel menace-panel-col' data-menace-col='"+n+"'>"
+    var colClass = "menace-panel menace-panel-col"
+    if(mode === "settings-dock"){
+        colClass += " menace-col-matchboxes-popout"
+    }
+    var output = "<div class='"+colClass+"' data-menace-col='"+n+"'>"
     output += "<h3 class='menace-col-heading' title='"+menacename+"'>"+menacename+"</h3>"
     output += "<div class='menace-bead-legend' aria-label='Move color legend (each color is a board cell)'>"
     output += "<div class='menace-bead-legend-grid'>"
@@ -112,6 +166,11 @@ function buildMenaceColumnHTML(n){
     output += "</div>"
     output += "<div class='menace-bead-legend-text'>Bead color = move cell</div>"
     output += "</div>"
+    if(mode === "matchboxes-only"){
+        output += buildMenaceMatchboxesTablesHTML(n)
+        output += "</div>"
+        return output
+    }
     output += "<div id='_"+n+"_tweak_s' class='menace-tweak-reveal'><button type='button' data-menace-action='show-settings' data-menace-id='"+n+"' class='menace-linkish'>Settings &#x25BC;</button></div>"
     output += "<div class='menace_settings' id='_"+n+"_tweak_h'>"
     output += "<div class='menace-tweak-hide'><button type='button' data-menace-action='hide-settings' data-menace-id='"+n+"' class='menace-linkish'>&#x25B2; Hide settings</button></div>"
@@ -148,41 +207,44 @@ function buildMenaceColumnHTML(n){
     output += "<button type='button' class='menace-btn-solid' data-menace-action='update' data-menace-id='"+n+"'>Save settings</button>"
     output += "<button type='button' class='menace-btn-solid menace-btn-warn' data-menace-action='update-reset' data-menace-id='"+n+"'>Save &amp; reset "+menacename+"</button>"
     output += "</div></div></div>"
-    var boxout = ""
-    var numb = 0
-    for(var move=0;move<menace[n]["orderedBoxes"].length;move++){
-        var moven = move * 2 + n;
-        var ord = menace[n]["orderedBoxes"][move]
-        if(moven == 1){
-            boxout += "<div class='menace-move-group'>1st move &middot; 1 box</div>";
-        } else {
-            var ordWord = ["","second","third","fourth","fifth","sixth","seventh","eighth","ninth"][moven-1] || ("move "+moven)
-            boxout += "<div class='menace-move-group'>"+ordWord+" move &middot; "+ord.length+" boxes</div>";
-        }
-        var cols = 0
-        boxout += "<div class='menace-moves-wrap'><table class='moves'>"
-        for(var k=0;k<ord.length;k++){
-            var key = ord[k]
-            if(cols == 0){
-                boxout += "<tr>"
-            }
-            cols += 1
-            numb += 1
-            boxout += "<td class='board' id='m"+n+"_board_"+key+"'>"+make_ox(key,n)+"</td>"
-            if(cols == 7){
-                boxout += "</tr>"
-                cols = 0
-            }
-        }
-        if(cols != 0){
-            boxout += "</tr>"
-        }
-        boxout += "</table></div>"
+    if(mode !== "settings-dock"){
+        output += buildMenaceMatchboxesTablesHTML(n)
     }
-    output += "<p class='menace-matchbox-intro'><strong>"+numb+"</strong> matchboxes total</p>"
-    output += boxout
     output += "</div>"
     return output
+}
+
+function menaceStartPopoutPoll(){
+    if(menacePopoutPollId != null){ return }
+    menacePopoutPollId = setInterval(function(){
+        var changed = false
+        for(var i=1;i<=2;i++){
+            var w = menacePopoutWindowRef[i]
+            if(w && w.closed){
+                menacePopoutWindowRef[i] = null
+                menaceMatchboxesPopoutOpen[i] = false
+                changed = true
+            }
+        }
+        if(changed){
+            showMenacePanels()
+        }
+        if(!menaceMatchboxesPopoutOpen[1] && !menaceMatchboxesPopoutOpen[2]){
+            clearInterval(menacePopoutPollId)
+            menacePopoutPollId = null
+        }
+    }, 400)
+}
+
+/* Rebuild matchbox HTML in open child windows (e.g. after Save & reset). */
+function menaceRefreshOpenPopoutGrids(){
+    for(var n=1;n<=2;n++){
+        var w = menacePopoutWindowRef[n]
+        if(!w || w.closed){ continue }
+        var inner = "<div class='menace-combined-box'><div class='menace-two-columns menace-single-column-popout'>" + buildMenaceColumnHTML(n, "matchboxes-only") + "</div></div>"
+        var note = "<p class=\"menace-popup-note\"><em>Play in the main window.</em> Matchboxes stay here; use the main panel for settings. Close this window to dock the matchboxes back.</p>"
+        w.document.body.innerHTML = inner + note
+    }
 }
 
 /* One bordered region: pop-out control + two columns (O learner | X learner). */
@@ -191,12 +253,16 @@ function showMenacePanels(){
     if(!root){ return }
     var html = "<div class='menace-combined-box'>"
     html += "<div class='menace-combined-toolbar menace-combined-toolbar-popouts'>"
-    html += "<button type='button' data-menace-action='popout-column' data-menace-id='1' class='menace-popout-btn'>Pop out MENACE O</button>"
-    html += "<button type='button' data-menace-action='popout-column' data-menace-id='2' class='menace-popout-btn'>Pop out MENACE X</button>"
+    for(var j=1;j<=2;j++){
+        var popped = menaceMatchboxesPopoutOpen[j]
+        var side = j === 1 ? "O" : "X"
+        var lbl = popped ? ("Show MENACE "+side+" matchboxes") : ("Pop out MENACE "+side)
+        html += "<button type='button' data-menace-action='popout-column' data-menace-id='"+j+"' class='menace-popout-btn'>"+lbl+"</button>"
+    }
     html += "</div>"
     html += "<div class='menace-two-columns'>"
-    html += buildMenaceColumnHTML(1)
-    html += buildMenaceColumnHTML(2)
+    html += buildMenaceColumnHTML(1, menaceMatchboxesPopoutOpen[1] ? "settings-dock" : "full")
+    html += buildMenaceColumnHTML(2, menaceMatchboxesPopoutOpen[2] ? "settings-dock" : "full")
     html += "</div></div>"
     root.innerHTML = html
 }
@@ -211,56 +277,33 @@ function hide_menace(n){
 
 function openMenaceColumnPopup(engineNum){
     if(engineNum !== 1 && engineNum !== 2){ return }
+    var prev = menacePopoutWindowRef[engineNum]
+    if(prev && !prev.closed){
+        prev.focus()
+        return
+    }
+    menaceMatchboxesPopoutOpen[engineNum] = true
+    showMenacePanels()
     var cssUrl = new URL("styles.css", window.location.href).href
     var title = engineNum === 1 ? "MENACE O matchboxes" : "MENACE X matchboxes"
     var wname = engineNum === 1 ? "menaceMatchboxes1" : "menaceMatchboxes2"
     var w = window.open("", wname, "width=620,height=720,scrollbars=yes,resizable=yes")
-    if(!w){ return }
-    var inner = "<div class='menace-combined-box'><div class='menace-two-columns menace-single-column-popout'>" + buildMenaceColumnHTML(engineNum) + "</div></div>"
+    if(!w){
+        menaceMatchboxesPopoutOpen[engineNum] = false
+        showMenacePanels()
+        return
+    }
+    menacePopoutWindowRef[engineNum] = w
+    var inner = "<div class='menace-combined-box'><div class='menace-two-columns menace-single-column-popout'>" + buildMenaceColumnHTML(engineNum, "matchboxes-only") + "</div></div>"
     w.document.open()
     w.document.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>"+title+"</title>")
     w.document.write("<link rel=\"stylesheet\" href=\""+cssUrl+"\">")
     w.document.write("</head><body class=\"menace-popup-body\">")
     w.document.write(inner)
-    w.document.write("<p class=\"menace-popup-note\"><em>Play in the main window.</em> Settings work here. After &ldquo;Save &amp; reset&rdquo;, open this pop-out again to refresh the grid.</p>")
+    w.document.write("<p class=\"menace-popup-note\"><em>Play in the main window.</em> Matchboxes stay here; use the main panel for settings. Close this window to dock the matchboxes back.</p>")
     w.document.write("</body></html>")
     w.document.close()
-    menaceWirePopupPanelDocument(w)
-}
-
-/* Popout is static HTML: no bundled scripts run there. Wire delegated events to opener logic with this window's document. */
-function menaceWirePopupPanelDocument(w){
-    if(!w || !w.document || !w.document.body){ return }
-    var s = w.document.createElement("script")
-    s.textContent = [
-        "(function(){",
-        "var D=document;",
-        "var O=window.opener;",
-        "if(!O)return;",
-        "function onClick(e){",
-        "var el=e.target.closest(\"[data-menace-action]\");",
-        "if(!el)return;",
-        "var action=el.getAttribute(\"data-menace-action\");",
-        "if(action===\"popout-column\")return;",
-        "var id=parseInt(el.getAttribute(\"data-menace-id\"),10);",
-        "if(id!==1&&id!==2)return;",
-        "if(action===\"show-settings\")O.show_set(id,D);",
-        "else if(action===\"hide-settings\")O.hide_set(id,D);",
-        "else if(action===\"reset-defaults\")O.resetMenaceSettingsFormToDefaults(id,D);",
-        "else if(action===\"update\")O.update_set(id,D);",
-        "else if(action===\"update-reset\")O.update_set_r(id,D);",
-        "}",
-        "function onInput(e){",
-        "var t=e.target;",
-        "if(t&&t.type===\"range\"&&t.classList.contains(\"menace-settings-slider\")&&O.syncMenaceSettingSliderDisplay){",
-        "O.syncMenaceSettingSliderDisplay(t,D);",
-        "}",
-        "}",
-        "D.addEventListener(\"click\",onClick);",
-        "D.addEventListener(\"input\",onInput);",
-        "})();"
-    ].join("")
-    w.document.body.appendChild(s)
+    menaceStartPopoutPoll()
 }
 
 /* id e.g. im1; value clamped 1..20 for initial HTML in show_menace. */
