@@ -209,6 +209,13 @@ function get_menace_move(n){
         if(where == "resign"){return "resign"}
         var hl = document.getElementById("m"+n+"-"+pos+"-"+where)
         if(hl){ hl.style.color = "#FF0000" }
+        var pw = menacePopoutWindowRef && menacePopoutWindowRef[n]
+        if(pw && !pw.closed){
+            try {
+                var phl = pw.document.getElementById("m"+n+"-"+pos+"-"+where)
+                if(phl){ phl.style.color = "#FF0000" }
+            } catch(e) { /* cross-origin / closed */ }
+        }
         inv_where = rotations[which_rot][where]
         menace[n]["moves"].push([pos,where])
         if(typeof setMenaceLastBoxUsed === "function"){
@@ -240,6 +247,13 @@ function recordHumanLearnerMove(engineId, boardBefore, realWhere){
     menace[engineId]["moves"].push([posCanon, whereCanon])
     var hl = document.getElementById("m"+engineId+"-"+posCanon+"-"+whereCanon)
     if(hl){ hl.style.color = "#FF0000" }
+    var pw = menacePopoutWindowRef && menacePopoutWindowRef[engineId]
+    if(pw && !pw.closed){
+        try {
+            var phl = pw.document.getElementById("m"+engineId+"-"+posCanon+"-"+whereCanon)
+            if(phl){ phl.style.color = "#FF0000" }
+        } catch(e) { /* cross-origin / closed */ }
+    }
     if(typeof setMenaceLastBoxUsed === "function"){
         setMenaceLastBoxUsed(engineId, posCanon)
     }

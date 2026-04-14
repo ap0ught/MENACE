@@ -34,8 +34,13 @@ function update_box(key,n){
     if(wrap){ wrap.innerHTML = make_ox(key,n) }
     var w = menacePopoutWindowRef[n]
     if(w && !w.closed){
-        var pw = w.document.getElementById("m"+n+"_board_"+key)
-        if(pw){ pw.innerHTML = make_ox(key,n) }
+        try {
+            var pw = w.document.getElementById("m"+n+"_board_"+key)
+            if(pw){ pw.innerHTML = make_ox(key,n) }
+        } catch(e) {
+            menacePopoutWindowRef[n] = null
+            menaceMatchboxesPopoutOpen[n] = false
+        }
     }
 }
 
